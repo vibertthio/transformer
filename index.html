@@ -23,10 +23,58 @@
     ></script>
   </head>
   <body>
-    <h1>Pop Music Transformer</h1>
+    <div id="splash">
+      <h1>Pop Music Transformer</h1>
 
-    <p id="response-info">
-      loading...
-    </p>
+      <h2>✍️ Riff → 🎵 Melody</h2>
+      <p class="project-description">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Commodi
+        temporibus reprehenderit eum sapiente quisquam sint nihil omnis eligendi
+        sunt numquam. Repudiandae reiciendis qui iste impedit voluptatibus quia,
+        enim cumque obcaecati.
+      </p>
+      <button id="splash-play-btn">play</button>
+      <p>
+        <a href="https://ailabs.tw/">👩‍💻 Taiwan AI Labs</a>
+        <br />
+        <a href="https://vibertthio.com/portfolio/">😀 Vibert Thio</a>
+      </p>
+    </div>
+
+    <div id="edit-splash">
+      <h1>Edit Something</h1>
+      <div id="edit-container">
+        <div id="edit-canvas-container">
+          <p id="edit-canvas-text">canvas div</p>
+          <canvas id="edit-canvas"></canvas>
+        </div>
+      </div>
+      <button id="edit-finish-btn">go back</button>
+    </div>
+
+    <header id="header">
+      <h1>Pop Music Transformer</h1>
+      <p id="response-info">
+        loading...
+      </p>
+    </header>
+
+    <div id="control-container">
+      <button id="edit-btn">edit</button>
+      <button>play</button>
+      <button>previous</button>
+      <button>next</button>
+      <select>
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="mercedes">Mercedes</option>
+        <option value="audi">Audi</option>
+      </select>
+    </div>
+
+    <div id="canvas-container">
+      <p id="canvas-text">canvas div</p>
+      <canvas id="play-canvas"></canvas>
+    </div>
   </body>
 </html>

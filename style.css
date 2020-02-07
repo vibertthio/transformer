@@ -1,4 +1,8 @@
-/* CSS files add styling rules to your content */
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
 
 body {
   font-family: helvetica, arial, sans-serif;
@@ -8,4 +12,122 @@ body {
 h1 {
   font-style: italic;
   color: #373fff;
+}
+
+/* edit splash */
+#edit-splash {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  z-index: 2;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 25vh 0;
+}
+/* canvas */
+#edit-container {
+  width: 40rem;
+  margin: 2rem auto;
+}
+#edit-canvas-container {
+  position: relative;
+  background-color: #373fff;
+  width: 40rem;
+  height: 20rem;
+}
+#edit-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#edit-canvas-text {
+  position: absolute;
+  color: #fff;
+  bottom: 0rem;
+  left: 1rem;
+  z-index: 1;
+}
+
+/* controls */
+#control-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2rem;
+}
+
+/* canvas */
+#canvas-container {
+  position: relative;
+  background-color: #373fff;
+  width: 40rem;
+  height: 20rem;
+}
+#play-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#canvas-text {
+  position: absolute;
+  color: #fff;
+  bottom: 0rem;
+  left: 1rem;
+  z-index: 1;
+}
+
+/* splash */
+#splash {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  z-index: 1;
+  text-align: center;
+  opacity: 1;
+  transition: opacity 0.3s;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  padding: 25vh 0;
+}
+#splash p {
+  margin: 0 auto;
+  max-width: 40rem;
+}
+#splash .project-description {
+  margin-bottom: 2rem;
+}
+#splash button {
+  border: 1px solid;
+  border-color: #373fff;
+  font-size: 1rem;
+  height: 40px;
+  width: 100px;
+  color: #373fff;
+  background-color: #fff;
+  margin-bottom: 2rem;
+}
+#splash button:hover {
+  border: 1px solid;
+  border-color: #fff;
+  color: #fff;
+  background-color: #373fff;
+}
+a {
+  background-color: #fff;
+  color: #373fff;
+  padding: 2px;
+  transition: color 0.5s;
+}
+a:hover {
+  color: #fff;
+  background-color: #373fff;
+  text-decoration: none;
 }
