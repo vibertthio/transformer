@@ -17,6 +17,22 @@ document.getElementById("edit-btn").addEventListener("click", () => {
   setTimeout(() => {
     splash.style.opacity = 1;
   }, 10);
+
+  const editCanvas = document.getElementById("edit-canvas");
+  const editCanvasContainer = document.getElementById("edit-canvas-container");
+  editCanvas.width = editCanvasContainer.clientWidth;
+  editCanvas.height = editCanvasContainer.clientHeight;
+  if (!editCanvas.getContext) {
+    console.log("<canvas> not supported.");
+  }
+  const editCtx = editCanvas.getContext("2d");
+  const { width, height } = editCanvas;
+  editCtx.fillStyle = "rgba(255, 255, 255, 0.8)";
+  editCtx.fillRect(0, 0, width, height);
+  editCtx.fillStyle = "rgb(200, 0, 0)";
+  editCtx.fillRect(50, 10, 50, 50);
+  editCtx.fillStyle = "rgba(0, 0, 200, 0.5)";
+  editCtx.fillRect(30, 30, 50, 50);
 });
 
 document.getElementById("edit-finish-btn").addEventListener("click", () => {
@@ -59,20 +75,3 @@ ctx.fillStyle = "rgb(200, 0, 0)";
 ctx.fillRect(10, 10, 50, 50);
 ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
 ctx.fillRect(30, 30, 50, 50);
-
-const editCanvas = document.getElementById("edit-canvas");
-const editCanvasContainer = document.getElementById("edit-canvas-container");
-editCanvas.width = editCanvasContainer.clientWidth;
-editCanvas.height = editCanvasContainer.clientHeight;
-if (!editCanvas.getContext) {
-  console.log("<canvas> not supported.");
-}
-const editCtx = editCanvas.getContext("2d");
-let { eWidth, eHeight } = editCanvas;
-
-editCtx.fillStyle = "rgba(255, 255, 255, 0.8)";
-editCtx.fillRect(0, 0, eWidth, eHeight);
-editCtx.fillStyle = "rgb(200, 0, 0)";
-editCtx.fillRect(10, 10, 50, 50);
-editCtx.fillStyle = "rgba(0, 0, 200, 0.5)";
-editCtx.fillRect(30, 30, 50, 50);

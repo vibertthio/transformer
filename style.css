@@ -2,11 +2,12 @@ html,
 body {
   width: 100%;
   height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 body {
   font-family: helvetica, arial, sans-serif;
-  margin: 2em;
 }
 
 h1 {
@@ -14,32 +15,41 @@ h1 {
   color: #373fff;
 }
 
+/* main page */
+#wrapper {
+  margin: 0;
+}
+#header {
+  width: "100%";
+  text-align: center;
+}
+
 /* edit splash */
 #edit-splash {
   display: none;
+  opacity: 0;
   position: absolute;
   top: 0;
   left: 0;
   margin: 0;
   z-index: 2;
   text-align: center;
-  opacity: 0;
   transition: opacity 0.3s;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 25vh 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 8vh 0;
 }
-/* canvas */
-#edit-container {
-  width: 40rem;
+#edit-canvas-wrapper {
+  width: 45rem;
   margin: 2rem auto;
 }
 #edit-canvas-container {
   position: relative;
   background-color: #373fff;
-  width: 40rem;
-  height: 20rem;
+  /* background-color: #ff0; */
+  width: "100%";
+  height: 25rem;
 }
 #edit-canvas {
   position: absolute;
@@ -57,11 +67,17 @@ h1 {
 /* controls */
 #control-container {
   display: flex;
+  width: "100%";
   flex-direction: row;
+  justify-content: center;
   margin-bottom: 2rem;
 }
 
 /* canvas */
+#canvas-wrapper {
+  width: 40rem;
+  margin: 2rem auto;
+}
 #canvas-container {
   position: relative;
   background-color: #373fff;

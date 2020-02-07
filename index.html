@@ -43,7 +43,7 @@
 
     <div id="edit-splash">
       <h1>Edit Something</h1>
-      <div id="edit-container">
+      <div id="edit-canvas-wrapper">
         <div id="edit-canvas-container">
           <p id="edit-canvas-text">canvas div</p>
           <canvas id="edit-canvas"></canvas>
@@ -51,30 +51,32 @@
       </div>
       <button id="edit-finish-btn">go back</button>
     </div>
+    <div id="wrapper">
+      <header id="header">
+        <h1>Pop Music Transformer</h1>
+        <p id="response-info">
+          loading...
+        </p>
+      </header>
+      <div id="control-container">
+        <button id="edit-btn">edit</button>
+        <button>play</button>
+        <button>previous</button>
+        <button>next</button>
+        <select>
+          <option value="volvo">Volvo</option>
+          <option value="saab">Saab</option>
+          <option value="mercedes">Mercedes</option>
+          <option value="audi">Audi</option>
+        </select>
+      </div>
 
-    <header id="header">
-      <h1>Pop Music Transformer</h1>
-      <p id="response-info">
-        loading...
-      </p>
-    </header>
-
-    <div id="control-container">
-      <button id="edit-btn">edit</button>
-      <button>play</button>
-      <button>previous</button>
-      <button>next</button>
-      <select>
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="mercedes">Mercedes</option>
-        <option value="audi">Audi</option>
-      </select>
-    </div>
-
-    <div id="canvas-container">
-      <p id="canvas-text">canvas div</p>
-      <canvas id="play-canvas"></canvas>
+      <div id="canvas-wrapper">
+        <div id="canvas-container">
+          <p id="canvas-text">canvas div</p>
+          <canvas id="play-canvas"></canvas>
+        </div>
+      </div>
     </div>
   </body>
 </html>
