@@ -27,7 +27,7 @@ document.getElementById("edit-btn").addEventListener("click", () => {
   }
   const editCtx = editCanvas.getContext("2d");
   const { width, height } = editCanvas;
-  editCtx.fillStyle = "rgba(255, 255, 255, 0.8)";
+  editCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
   editCtx.fillRect(0, 0, width, height);
   editCtx.fillStyle = "rgb(200, 0, 0)";
   editCtx.fillRect(50, 10, 50, 50);
@@ -44,11 +44,8 @@ document.getElementById("edit-finish-btn").addEventListener("click", () => {
 });
 
 async function postData(url = "", data = {}) {
-  // Default options are marked with *
   const response = await fetch(url, {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
-    mode: "no-cors", // no-cors, *cors, same-origin
-    verify: false,
+    method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
@@ -59,6 +56,8 @@ async function postData(url = "", data = {}) {
   return d;
 }
 
+postData(SERVER_URL, data.input);
+
 // canvas
 let canvas = document.getElementById("play-canvas");
 let canvasContainer = document.getElementById("canvas-container");
@@ -67,11 +66,46 @@ canvas.height = canvasContainer.clientHeight;
 if (!canvas.getContext) {
   console.log("<canvas> not supported.");
 }
-let ctx = canvas.getContext("2d");
-let { width, height } = canvas;
-ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-ctx.fillRect(0, 0, width, height);
-ctx.fillStyle = "rgb(200, 0, 0)";
-ctx.fillRect(10, 10, 50, 50);
-ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-ctx.fillRect(30, 30, 50, 50);
+
+const draw = () => {
+  // do things
+  let ctx = canvas.getContext("2d");
+  let { width, height } = canvas;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "rgb(200, 0, 0)";
+  ctx.fillRect(10, 10, 50, 50);
+  ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+  ctx.fillRect(30 + 30 * Math.sin(Date.now() * 0.01), 30, 50, 50);
+
+  requestAnimationFrame(() => {
+    draw();
+  });
+};
+
+// const audioContext = new window.AudioContext();
+const audioContext = new Tone.Context();
+StartAudioContext(audioContext, "#play-btn", () => {
+  console.log("tone ac", Tone.context);
+  console.log("ac", audioContext);
+
+  var player = new WebAudioFontPlayer();
+  player.loader.decodeAfterLoading(
+    audioContext,
+    "_tone_0250_SoundBlasterOld_sf2"
+  );
+  function play() {
+    player.queueWaveTable(
+      audioContext,
+      audioContext.destination,
+      _tone_0250_SoundBlasterOld_sf2,
+      0,
+      12 * 4 + 7,
+      2
+    );
+    return false;
+  }
+  play();
+  draw();
+});

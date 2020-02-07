@@ -10,17 +10,12 @@
     <link rel="stylesheet" href="/style.css" />
 
     <!-- import the webpage's javascript file -->
-    <script
-      type="text/javascript"
-      language="javascript"
-      src="/data.js"
-    ></script>
-    <script
-      type="text/javascript"
-      language="javascript"
-      src="/script.js"
-      defer
-    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.5/Tone.min.js"></script>
+    <script src="https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js"></script>
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0250_SoundBlasterOld_sf2.js"></script>
+    <script src="./data.js"></script>
+    <script src="./libs/StartAudioContext.js"></script>
+    <script src="./script.js" defer></script>
   </head>
   <body>
     <div id="splash">
@@ -60,7 +55,7 @@
       </header>
       <div id="control-container">
         <button id="edit-btn">edit</button>
-        <button>play</button>
+        <button id="play-btn">play</button>
         <button>previous</button>
         <button>next</button>
         <select>

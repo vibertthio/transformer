@@ -50,6 +50,7 @@ h1 {
   /* background-color: #ff0; */
   width: "100%";
   height: 25rem;
+  border-radius: 1rem;
 }
 #edit-canvas {
   position: absolute;
@@ -77,17 +78,20 @@ h1 {
 #canvas-wrapper {
   width: 40rem;
   margin: 2rem auto;
+  border-radius: 1rem;
 }
 #canvas-container {
   position: relative;
-  background-color: #373fff;
   width: 40rem;
   height: 20rem;
+  border-radius: 1rem;
+  /* background-color: #373fff; */
 }
 #play-canvas {
   position: absolute;
   top: 0;
   left: 0;
+  border-radius: 1rem;
 }
 #canvas-text {
   position: absolute;
