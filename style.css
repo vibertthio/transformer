@@ -1,7 +1,11 @@
+* {
+  font-family: "IBM Plex Mono", monospace;
+}
+
 html,
 body {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   padding: 0;
   margin: 0;
 }
@@ -11,13 +15,18 @@ body {
 }
 
 h1 {
-  font-style: italic;
+  /* font-style: italic; */
+  margin: 0 0 1rem 0;
+  padding-top: 1rem;
   color: #373fff;
 }
 
 /* main page */
 #wrapper {
-  margin: 0;
+  margin: 0 auto;
+  width: 90%;
+  max-width: 800px;
+  height: 100vh;
 }
 #header {
   width: "100%";
@@ -29,60 +38,98 @@ h1 {
   display: none;
   opacity: 0;
   position: absolute;
+  /* top: -200vh; */
   top: 0;
   left: 0;
   margin: 0;
   z-index: 2;
   text-align: center;
-  transition: opacity 0.3s;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 8vh 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease 0s;
+  /* transition: top 0.5s; */
+}
+#edit-splash-container {
+  width: 80%;
+  max-width: 700px;
+  background-color: rgba(80, 80, 80, 0.8);
+  padding: 1rem 0 1rem 0;
+  margin: 20vh auto 0 auto;
+  border-radius: 1rem;
+}
+#edit-splash-container h1 {
+  color: #fff;
+  /* background-color: rgba(230, 230, 230, 1); */
+  /* width: 10rem; */
+  margin: 0 auto 0.5rem auto;
+  padding: 0 1rem 0 1rem;
 }
 #edit-canvas-wrapper {
-  width: 45rem;
-  margin: 2rem auto;
+  width: 90%;
+  max-width: 500px;
+  margin: 0rem auto;
+  border-radius: 1rem;
 }
 #edit-canvas-container {
   position: relative;
-  background-color: #373fff;
-  /* background-color: #ff0; */
+  /* background-color: #373fff; */
+  background-color: bisque;
   width: "100%";
-  height: 25rem;
+  height: 20rem;
   border-radius: 1rem;
 }
 #edit-canvas {
   position: absolute;
   top: 0;
   left: 0;
+  border-radius: 1rem;
 }
 #edit-canvas-text {
   position: absolute;
   color: #fff;
+  background-color: #373fff;
+  opacity: 0.5;
   bottom: 0rem;
-  left: 1rem;
+  right: 1rem;
   z-index: 1;
+}
+#edit-control-container {
+  display: flex;
+  width: "80%";
+  max-width: 400px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  margin: 1rem auto 0 auto;
+  height: 2rem;
+  /* background-color: rgba(230, 230, 230, 1); */
 }
 
 /* controls */
 #control-container {
   display: flex;
-  width: "100%";
+  width: "80%";
+  max-width: 400px;
   flex-direction: row;
-  justify-content: center;
-  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: space-evenly;
+  margin: 0 auto 2rem auto;
+  height: 2rem;
+  background-color: rgba(230, 230, 230, 1);
 }
 
 /* canvas */
 #canvas-wrapper {
-  width: 40rem;
+  width: "90%";
+  max-width: 600px;
+  background-color: bisque;
   margin: 2rem auto;
   border-radius: 1rem;
 }
 #canvas-container {
   position: relative;
-  width: 40rem;
+  width: 100%;
   height: 20rem;
   border-radius: 1rem;
   /* background-color: #373fff; */
@@ -95,10 +142,12 @@ h1 {
 }
 #canvas-text {
   position: absolute;
+  background-color: #373fff;
   color: #fff;
   bottom: 0rem;
-  left: 1rem;
+  right: 1rem;
   z-index: 1;
+  opacity: 0.5;
 }
 
 /* splash */

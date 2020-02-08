@@ -6,13 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- font -->
+    <link
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|VT323&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/225/guitar_1f3b8.png"
+    />
+
     <!-- import the webpage's stylesheet -->
     <link rel="stylesheet" href="/style.css" />
 
     <!-- import the webpage's javascript file -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.5/Tone.min.js"></script>
     <script src="https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js"></script>
-    <script src="https://surikov.github.io/webaudiofontdata/sound/0250_SoundBlasterOld_sf2.js"></script>
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js"></script>
     <script src="./data.js"></script>
     <script src="./libs/StartAudioContext.js"></script>
     <script src="./script.js" defer></script>
@@ -37,20 +51,36 @@
     </div>
 
     <div id="edit-splash">
-      <h1>Edit Something</h1>
-      <div id="edit-canvas-wrapper">
-        <div id="edit-canvas-container">
-          <p id="edit-canvas-text">canvas div</p>
-          <canvas id="edit-canvas"></canvas>
+      <div id="edit-splash-container">
+        <h1>Create New Riff</h1>
+        <div id="edit-canvas-wrapper">
+          <div id="edit-canvas-container">
+            <p id="edit-canvas-text">some tips...</p>
+            <canvas id="edit-canvas"></canvas>
+          </div>
+        </div>
+
+        <div id="edit-control-container">
+          <button>send</button>
+          <button id="edit-finish-btn">cancel</button>
+          <button>play</button>
+          <select>
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+          </select>
         </div>
       </div>
-      <button id="edit-finish-btn">go back</button>
     </div>
     <div id="wrapper">
       <header id="header">
         <h1>Pop Music Transformer</h1>
         <p id="response-info">
-          loading...
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi
+          maxime ullam ducimus sit voluptatibus totam iure obcaecati doloribus,
+          eum quibusdam magni fugit cupiditate iusto praesentium sed atque,
+          necessitatibus voluptates! Pariatur.
         </p>
       </header>
       <div id="control-container">
@@ -68,7 +98,7 @@
 
       <div id="canvas-wrapper">
         <div id="canvas-container">
-          <p id="canvas-text">canvas div</p>
+          <p id="canvas-text">some tips...</p>
           <canvas id="play-canvas"></canvas>
         </div>
       </div>
