@@ -110,6 +110,8 @@ h1 {
   border-radius: 0.5rem;
 }
 #edit-loading-text-div {
+  border: 5px solid;
+  border-color: #fff;
   position: relative;
   display: none;
   justify-content: center;
