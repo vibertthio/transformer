@@ -44,75 +44,102 @@ document.getElementById("edit-btn").addEventListener("click", () => {
   editCanvas.width = editCanvasContainer.clientWidth;
   editCanvas.height = editCanvasContainer.clientHeight;
 });
-document.getElementById("edit-finish-btn").addEventListener("click", () => {
-  const splash = document.getElementById("edit-splash");
-  // splash.classList.remove("show");
-  splash.style.opacity = 0;
-  editing = false;
-  setTimeout(() => {
-    splash.style.display = "none";
-  }, 500);
+document.getElementById("edit-cancel-btn").addEventListener("click", () => {
+  stopEditSequencer();
+  closeEditSplash();
 });
 document.getElementById("play-btn").addEventListener("click", () => {
-  console.log("state", sequencer.state);
   if (sequencer.state === "started") {
     stopMainSequencer();
   } else {
     startMainSequencer();
   }
 });
-document.getElementById("edit-canvas").addEventListener("mousemove", e => {
-  const { clientX, clientY } = e;
-  const { width, height } = editCanvas;
-  const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-  const hUnit = height / NUMBER_OF_NOTES;
+document.getElementById("edit-play-btn").addEventListener("click", () => {
+  if (editSequencer.state === "started") {
+    stopEditSequencer();
+  } else {
+    startEditSequencer();
+  }
+});
+document.getElementById("edit-send-btn").addEventListener("click", async () => {
+  stopEditSequencer();
+  document.getElementById("edit-loading-text-div").style.display = "flex";
+  const response = await postData(SERVER_URL, {
+    pianoroll: inputPianoroll,
+    n_bar: 6,
+    temperature: 1.2
+  });
+  console.log("res", response);
 
-  mousePosition.x = clientX - editCanvasRect.left;
-  mousePosition.y = clientY - editCanvasRect.top;
-  const x = Math.floor(mousePosition.x / wUnit);
-  const y = Math.floor(mousePosition.y / hUnit);
+  document.getElementById("edit-loading-text-div").style.display = "none";
+  closeEditSplash();
 
-  if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
+  if (response.state === "success") {
+    pianoroll = response.data.pianoroll;
+    events = getEventsTimelineFromMatrix(pianoroll);
+  } else {
+    console.error("something wrong with the server");
+  }
+});
+document
+  .getElementById("edit-splash-container")
+  .addEventListener("mousemove", e => {
+    const { clientX, clientY } = e;
+    const { width, height } = editCanvas;
+    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+    const hUnit = height / NUMBER_OF_NOTES;
+
+    mousePosition.x = clientX - editCanvasRect.left;
+    mousePosition.y = clientY - editCanvasRect.top;
+    const x = Math.floor(mousePosition.x / wUnit);
+    const y = Math.floor(mousePosition.y / hUnit);
+
+    if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
+      const row = NUMBER_OF_NOTES - y - 1;
+      inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
+    }
+    mouseEditIndex.x = x;
+    mouseEditIndex.y = y;
+  });
+document
+  .getElementById("edit-splash-container")
+  .addEventListener("mousedown", e => {
+    mouseEditing = true;
+    const { width, height } = editCanvas;
+    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+    const hUnit = height / NUMBER_OF_NOTES;
+
+    const { clientX, clientY } = e;
+    mousePosition.x = clientX - editCanvasRect.left;
+    mousePosition.y = clientY - editCanvasRect.top;
+    const x = Math.floor(mousePosition.x / wUnit);
+    const y = Math.floor(mousePosition.y / hUnit);
+
     const row = NUMBER_OF_NOTES - y - 1;
     inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
-  }
-  mouseEditIndex.x = x;
-  mouseEditIndex.y = y;
-});
-document.getElementById("edit-canvas").addEventListener("mousedown", e => {
-  mouseEditing = true;
-  const { width, height } = editCanvas;
-  const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-  const hUnit = height / NUMBER_OF_NOTES;
 
-  const { clientX, clientY } = e;
-  mousePosition.x = clientX - editCanvasRect.left;
-  mousePosition.y = clientY - editCanvasRect.top;
-  const x = Math.floor(mousePosition.x / wUnit);
-  const y = Math.floor(mousePosition.y / hUnit);
+    mouseEditIndex.x = x;
+    mouseEditIndex.y = y;
 
-  const row = NUMBER_OF_NOTES - y - 1;
-  inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
+    console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+  });
+document
+  .getElementById("edit-splash-container")
+  .addEventListener("mouseup", e => {
+    mouseEditing = false;
+    const { width, height } = editCanvas;
+    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+    const hUnit = height / NUMBER_OF_NOTES;
 
-  mouseEditIndex.x = x;
-  mouseEditIndex.y = y;
-
-  console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
-});
-document.getElementById("edit-canvas").addEventListener("mouseup", e => {
-  mouseEditing = false;
-  const { width, height } = editCanvas;
-  const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-  const hUnit = height / NUMBER_OF_NOTES;
-
-  const { clientX, clientY } = e;
-  mousePosition.x = clientX - editCanvasRect.left;
-  mousePosition.y = clientY - editCanvasRect.top;
-  // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
-  // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
-  console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
-  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
-});
+    const { clientX, clientY } = e;
+    mousePosition.x = clientX - editCanvasRect.left;
+    mousePosition.y = clientY - editCanvasRect.top;
+    // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
+    // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
+    console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+    inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+  });
 
 // methods
 async function postData(url = "", data = {}) {
@@ -126,6 +153,15 @@ async function postData(url = "", data = {}) {
   const d = await response.json();
   console.log("response", d);
   return d;
+}
+function closeEditSplash() {
+  const splash = document.getElementById("edit-splash");
+  // splash.classList.remove("show");
+  splash.style.opacity = 0;
+  editing = false;
+  setTimeout(() => {
+    splash.style.display = "none";
+  }, 500);
 }
 function getEventsTimelineFromMatrix(p) {
   const playingNotes = {};
@@ -166,8 +202,13 @@ function drawPianoroll(ctx, events) {
   ctx.fillStyle = "rgba(230, 230, 230, 1)";
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "rgba(0, 0, 200, 0.9)";
-  ctx.fillRect(wUnit * NUMBER_OF_INPUT_BARS * NOTES_PER_BAR, 0, wUnit, height);
+  ctx.fillStyle = "rgba(0, 0, 200, 0.6)";
+  ctx.fillRect(
+    wUnit * NUMBER_OF_INPUT_BARS * NOTES_PER_BAR - wUnit,
+    0,
+    wUnit,
+    height
+  );
   ctx.fillStyle = "rgba(0, 0, 200, 0.3)";
   ctx.fillRect(0, 0, wUnit * NUMBER_OF_INPUT_BARS * NOTES_PER_BAR, height);
 
@@ -238,6 +279,16 @@ function drawEditingPianoroll(ctx, events, matrix) {
     // ctx.restore();
   }
 
+  ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+  ctx.fillRect(width - wUnit, 0, wUnit, height);
+  ctx.fillStyle = "rgba(0, 0, 200, 0.2)";
+  ctx.fillRect(0, 0, wUnit * NUMBER_OF_INPUT_BARS * NOTES_PER_BAR, height);
+
+  if (editSequencer.state === "started") {
+    ctx.fillStyle = "rgb(0, 200, 0)";
+    ctx.fillRect(width * editSequencer.progress, 0, wUnit, height);
+  }
+
   if (!mouseEditing) {
     for (let col = 0; col < events.length; col++) {
       if (!events[col]) {
@@ -248,7 +299,7 @@ function drawEditingPianoroll(ctx, events, matrix) {
         ctx.save();
         ctx.translate(col * wUnit, height - (note + 1) * hUnit);
         if (
-          sequencer.state === "started" &&
+          editSequencer.state === "started" &&
           beat >= col &&
           beat < col + length
         ) {
@@ -301,25 +352,29 @@ function draw() {
     draw();
   });
 }
-function stopMainSequencer() {
-  console.log("envs", envs);
+function stopMainSequencer(time) {
+  beat = -1;
   sequencer.stop();
-  // sequencer.cancel();
-  envs.forEach(e => e.envelope.cancel());
-  envs = [];
+  // sequencer.cancel(time ? time : undefined);
+  envelopes.forEach(e => e.envelope.cancel());
+  envelopes = [];
 }
 function startMainSequencer() {
-  console.log("start now.");
   // sequencer.start(audioContext.now());
   sequencer.start();
+}
+function stopEditSequencer() {
+  beat = -1;
+  editSequencer.stop();
+}
+function startEditSequencer() {
+  editSequencer.start();
 }
 
 // audio
 const audioContext = new Tone.Context();
-let sequencer;
 let editing = false;
-let envs = [];
-let beat = 0;
+
 let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
 let pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
 let events = getEventsTimelineFromMatrix(pianoroll);
@@ -339,23 +394,24 @@ const play = (time = 0, pitch = 55, length = 8, vol = 0.3) => {
     vol
   );
 };
-
-sequencer = new Tone.Sequence(
+let beat = -1;
+let envelopes = [];
+const sequencer = new Tone.Sequence(
   (time, b) => {
-    envs = envs.filter(env => env.end >= b);
+    envelopes = envelopes.filter(env => env.end >= b);
     beat = b;
     const es = events[b];
     if (es) {
       es.forEach(({ note, length }) => {
         const env = play(time, note + NUMBER_OF_NOTES, length * 0.2);
-        envs.push({
+        envelopes.push({
           end: b + length,
           envelope: env
         });
       });
     }
-    if (b >= 127) {
-      console.log("b -> 127: stop");
+    if (b >= NUMBER_OF_BARS * NOTES_PER_BAR - 1) {
+      console.log(`b[${NUMBER_OF_BARS * NOTES_PER_BAR}]: stop`);
       // stopMainSequencer();
       sequencer.stop();
       sequencer.cancel(time);
@@ -363,6 +419,36 @@ sequencer = new Tone.Sequence(
     }
   },
   Array(NUMBER_OF_BARS * NOTES_PER_BAR)
+    .fill(null)
+    .map((_, i) => i),
+  "16n"
+);
+
+// let editBeat = -1;
+// let editEnvelopes = [];
+const editSequencer = new Tone.Sequence(
+  (time, b) => {
+    envelopes = envelopes.filter(env => env.end >= b);
+    beat = b;
+    const es = inputEvents[b];
+    if (es) {
+      es.forEach(({ note, length }) => {
+        const env = play(time, note + NUMBER_OF_NOTES, length * 0.2);
+        envelopes.push({
+          end: b + length,
+          envelope: env
+        });
+      });
+    }
+    if (b >= NUMBER_OF_INPUT_BARS * NOTES_PER_BAR - 1) {
+      console.log(`b[${NUMBER_OF_INPUT_BARS * NOTES_PER_BAR}]: stop`);
+      // stopMainSequencer();
+      editSequencer.stop();
+      editSequencer.cancel(time);
+      beat = -1;
+    }
+  },
+  Array(NUMBER_OF_INPUT_BARS * NOTES_PER_BAR)
     .fill(null)
     .map((_, i) => i),
   "16n"
@@ -388,4 +474,4 @@ StartAudioContext(audioContext, "#play-btn", () => {
   draw();
   // startMainSequencer();
 });
-postData(SERVER_URL, data[INITIAL_DATA_INDEX].input);
+// postData(SERVER_URL, data[INITIAL_DATA_INDEX].input);
