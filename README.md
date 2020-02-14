@@ -1,3 +1,2 @@
-# Hi, Pop Music Transformer
+![](./assets/transformer.png)
 
-by Remy (Taiwan AI Labs) & Vibert Thio
