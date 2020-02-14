@@ -1,13 +1,15 @@
 const EDIT_LOOP = true;
 const BPM = 120;
-const INITIAL_DATA_INDEX = 2;
+const INITIAL_DATA_INDEX = 0;
 const NUMBER_OF_NOTES = 36;
 const NUMBER_OF_BARS = 8;
 const NUMBER_OF_INPUT_BARS = 2;
 const NOTE_EXTENSION = 15;
 const NOTES_PER_BAR = 16;
 const SERVER_URL =
-  "https://developer.ailabs.tw/ai-music-piano-transformer-service/api/getPianoMidi";
+  "https://developer.ailabs.tw/ai-music-piano-transformer-service/api/";
+const POST_MIDI_URL = SERVER_URL + "getPianoMidi";
+const GET_SERVER_STATE_URL = SERVER_URL + "getJobQueueSize";
 
 const controlPlayButton = document.getElementById("play-btn");
 const controlEditPlayButton = document.getElementById("edit-play-btn");
@@ -88,12 +90,27 @@ document.getElementById("edit-send-btn").addEventListener("click", async () => {
   }
   waitingForResponse = true;
   stopEditSequencer();
+  const textElement = document.getElementById("edit-loading-text");
   document.getElementById("edit-loading-text-div").style.display = "flex";
-  const response = await postData(SERVER_URL, {
+  const timeId = setInterval(() => {
+    textElement.textContent += ".";
+    if (textElement.textContent.length >= 10) {
+      textElement.textContent = "loading";
+    }
+  }, 300);
+  const { average_runtime, num_engine, qsize, state } = await sendGetRequest();
+  if (state === "success") {
+    const el = document.getElementById("edit-loading-text-server");
+    el.style.display = "block";
+    el.textContent = `It takes ~${average_runtime} seconds.
+		There are ${qsize} tasks in queue on ${num_engine} engines.`;
+  }
+  const response = await postData(POST_MIDI_URL, {
     pianoroll: inputPianoroll,
     n_bar: 6,
     temperature: 1.2
   });
+  clearInterval(timeId);
   waitingForResponse = false;
   // console.log("res", response);
 
@@ -149,8 +166,12 @@ document
 
     mousePosition.x = clientX - editCanvasRect.left;
     mousePosition.y = clientY - editCanvasRect.top;
-    const x = Math.floor(mousePosition.x / wUnit);
-    const y = Math.floor(mousePosition.y / hUnit);
+    // const x = Math.floor(mousePosition.x / wUnit);
+    // const y = Math.floor(mousePosition.y / hUnit);
+    const x = Math.floor(mousePosition.x / wUnit - 0.5);
+    const y = Math.floor(mousePosition.y / hUnit - 0.5);
+
+    // console.log(`[x]${x} [y]${y}`);
 
     if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
       const row = NUMBER_OF_NOTES - y - 1;
@@ -180,8 +201,8 @@ document
     const { clientX, clientY } = e;
     mousePosition.x = clientX - editCanvasRect.left;
     mousePosition.y = clientY - editCanvasRect.top;
-    const x = Math.floor(mousePosition.x / wUnit);
-    const y = Math.floor(mousePosition.y / hUnit);
+    const x = Math.floor(mousePosition.x / wUnit - 0.5);
+    const y = Math.floor(mousePosition.y / hUnit - 0.5);
 
     const row = NUMBER_OF_NOTES - y - 1;
 
@@ -197,7 +218,7 @@ document
     mouseEditIndex.x = x;
     mouseEditIndex.y = y;
 
-    console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+    // console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
   });
 document
   .getElementById("edit-splash-container")
@@ -215,9 +236,13 @@ document
     mousePosition.y = clientY - editCanvasRect.top;
     // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
     // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
-    console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+    // console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
     inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
   });
+document.getElementById("preset-select").addEventListener("change", e => {
+  const index = e.target.value;
+  updateEditPianorollAndEvents(data[index].input.pianoroll);
+});
 
 // methods
 async function postData(url = "", data = {}) {
@@ -229,7 +254,12 @@ async function postData(url = "", data = {}) {
     body: JSON.stringify(data)
   });
   const d = await response.json();
-  console.log("response", d);
+  // console.log("response", d);
+  return d;
+}
+async function sendGetRequest(url = GET_SERVER_STATE_URL) {
+  const response = await fetch(url);
+  const d = await response.json();
   return d;
 }
 function closeEditSplash() {
@@ -270,6 +300,10 @@ function getEventsTimelineFromMatrix(p) {
     }
   }
   return result;
+}
+function updateEditPianorollAndEvents(p) {
+  inputPianoroll = p;
+  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
 }
 function drawPianoroll(ctx, events) {
   const { width, height } = ctx.canvas;
@@ -386,6 +420,14 @@ function drawEditingPianoroll(ctx, events, matrix) {
           ctx.fillStyle = "rgb(50, 60, 60)";
         }
         ctx.fillRect(0, 0, length * wUnit, hUnit);
+
+        if (waitingForResponse) {
+          const opacity =
+            (Math.sin(Date.now() * 0.005 + col * 0.1 + i * 0.2) * 0.5 + 0.5) *
+            1.0;
+          ctx.fillStyle = `rgba(255, 0, 255, ${opacity})`;
+          ctx.fillRect(0, 0, length * wUnit, hUnit);
+        }
         ctx.restore();
       }
     }
@@ -404,12 +446,20 @@ function drawEditingPianoroll(ctx, events, matrix) {
   }
 
   // ctx.beginPath();
-  const mr = Math.floor(mousePosition.x / wUnit);
-  const mc = Math.floor(mousePosition.y / hUnit);
+  // const mr = Math.floor(mousePosition.x / wUnit);
+  // const mc = Math.floor(mousePosition.y / hUnit);
+  const mr = mouseEditIndex.x;
+  const mc = mouseEditIndex.y;
   ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
   ctx.fillRect(mr * wUnit, mc * hUnit, wUnit, hUnit);
   // ctx.arc(mousePosition.x, mousePosition.y, 20, 0, 2 * Math.PI);
   // ctx.fill();
+
+  if (waitingForResponse) {
+    const opacity = (Math.sin(Date.now() * 0.005) * 0.5 + 0.5) * 0.5;
+    ctx.fillStyle = `rgba(0, 255, 255, ${opacity})`;
+    ctx.fillRect(0, 0, width, height);
+  }
 }
 function setup() {
   Tone.Transport.start();
@@ -441,7 +491,7 @@ function stopMainSequencer(cancelEnvelopes = true) {
   envelopes = [];
 }
 function startMainSequencer() {
-  controlPlayButton.textContent = "⬜️stop";
+  controlPlayButton.textContent = "stop";
   sequencer.start(audioContext.now());
   // sequencer.start();
 }
@@ -456,7 +506,7 @@ function stopEditSequencer(cancelEnvelopes = true) {
   envelopes = [];
 }
 function startEditSequencer() {
-  controlEditPlayButton.textContent = "⬜️stop";
+  controlEditPlayButton.textContent = "stop";
   editSequencer.start(audioContext.now());
 }
 function pushHistory() {
@@ -488,12 +538,13 @@ function traverseHistory(index) {
 
 // audio
 const audioContext = new Tone.Context();
+// Tone.context = audioContext;
 let editing = false;
 let waitingForResponse = false;
 
-let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
 let pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
 let events = getEventsTimelineFromMatrix(pianoroll);
+let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
 let inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
 pushHistory();
 

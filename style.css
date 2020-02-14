@@ -19,6 +19,7 @@ h1 {
   margin: 0 0 1rem 0;
   padding-top: 1rem;
   color: #373fff;
+  font-weight: 500;
 }
 
 /* main page */
@@ -114,11 +115,13 @@ h1 {
   border-color: #fff;
   position: relative;
   display: none;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 
-  background-color: #373fff;
-  opacity: 0.5;
+  /* background-color: #373fff; */
+  opacity: 1;
   margin: 0 auto;
   font-size: 1.3rem;
   width: 100%;
@@ -129,6 +132,20 @@ h1 {
 #edit-loading-text {
   color: #fff;
   font-size: 1.3rem;
+  background-color: #373fff;
+  border-radius: 1rem;
+  padding: 1rem;
+  opacity: 0.8;
+}
+#edit-loading-text-server {
+  color: #fff;
+  display: none;
+  width: 70%;
+  font-size: 0.8rem;
+  background-color: #373fff;
+  border-radius: 1rem;
+  padding: 1rem;
+  opacity: 0.8;
 }
 #edit-control-container {
   display: flex;
@@ -162,6 +179,9 @@ select:hover {
   /* border-color: #373fff; */
   color: #fff;
   background-color: #373fff;
+}
+#edit-send-btn {
+  font-weight: bold;
 }
 
 /* controls */
@@ -204,6 +224,9 @@ select:hover {
 #control-div {
   position: relative;
 }
+#play-btn {
+  min-width: 100px;
+}
 #history-span {
   position: absolute;
   color: #373fff;
@@ -236,6 +259,7 @@ select:hover {
   border-radius: 1rem;
 }
 #canvas-text {
+  user-select: none;
   position: absolute;
   background-color: #373fff;
   color: #fff;
@@ -247,14 +271,18 @@ select:hover {
   border-radius: 0.5rem;
 }
 #canvas-text-left {
+  user-select: none;
   position: absolute;
   background-color: #fff;
   bottom: 0rem;
   left: 1rem;
   z-index: 1;
-  opacity: 0.8;
+  opacity: 0.4;
   padding: 0.2rem 0.5rem 0.2rem 0.5rem;
   border-radius: 0.5rem;
+}
+#canvas-text-left:hover {
+  opacity: 1;
 }
 
 /* splash */
@@ -282,6 +310,7 @@ select:hover {
 }
 #splash .project-description {
   margin-bottom: 2rem;
+  line-height: 1.4rem;
 }
 #splash button {
   outline: none;
@@ -305,25 +334,33 @@ select:hover {
 }
 #left-corner {
   position: absolute;
-  left: 2rem;
-  bottom: 2rem;
+  left: 1.8rem;
+  bottom: 1.5rem;
 }
 #right-corner {
   position: absolute;
   right: 2rem;
-  bottom: 2rem;
+  bottom: 1.5rem;
 }
 
-a {
+a.link {
   background-color: #fff;
   color: #373fff;
   padding: 2px;
   transition: color 0.5s;
 }
-a:hover {
+a.link:hover {
   color: #fff;
   background-color: #373fff;
   text-decoration: none;
+}
+
+a.logo {
+  opacity: 0.2;
+  transition: opacity 0.3s;
+}
+a.logo:hover {
+  opacity: 1;
 }
 
 footer {

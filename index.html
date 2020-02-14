@@ -21,7 +21,7 @@
 
     <!-- font -->
     <link
-      href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|VT323&display=swap"
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,500,700&display=swap"
       rel="stylesheet"
     />
 
@@ -51,24 +51,48 @@
 
         <h2>✍️ Riff → 🎵 Melody</h2>
         <p class="project-description">
-          (Description) Lorem ipsum, dolor sit amet consectetur adipisicing
-          elit. Commodi temporibus reprehenderit eum sapiente quisquam sint
-          nihil omnis eligendi sunt numquam. Repudiandae reiciendis qui iste
-          impedit voluptatibus quia, enim cumque obcaecati.
+          Join force with this AI to create music! Based on your input, the
+          model can compose subsequent notes. Draw something to inspire the
+          model, and it could be anything you like! Check out the
+          <a
+            class="link"
+            href="https://github.com/YatingMusic/remi"
+            target="_blank"
+            >paper</a
+          >
+          if you are interested in the model.
         </p>
         <button id="splash-play-btn">► play</button>
         <p>
-          (edit)
-          <a href="https://ailabs.tw/">👩‍💻 Taiwan AI Labs</a> +
-          <a href="https://vibertthio.com/portfolio/">😀 Vibert Thio</a>
+          <a class="link" href="https://ailabs.tw/" target="_blank"
+            >👩‍💻 AILabs.tw</a
+          >
+          +
+          <a
+            class="link"
+            href="https://vibertthio.com/portfolio/"
+            target="_blank"
+            >😀 Vibert Thio</a
+          >
         </p>
       </div>
 
       <p id="right-corner">
-        <a href="https://ailabs.tw/">Terms & Service</a>
+        <!-- <a class="logo" href="https://vibertthio.com/portfolio/" target="_blank"
+          ><img src="./assets/vibert.png" alt="vibert logo" height="21"
+        /></a> -->
+        <a class="logo" href="https://www.sinica.edu.tw/" target="_blank"
+          ><img src="./assets/sinica.png" alt="sinica logo" height="21"
+        /></a>
+        <a class="logo" href="http://ailabs.tw/" target="_blank"
+          ><img src="./assets/ailabs.png" alt="ailabs logo" height="21"
+        /></a>
+        <!-- <a href="https://ailabs.tw/">Terms & Service</a> -->
       </p>
       <p id="left-corner">
-        <a href="https://vibertthio.com/portfolio/">More Details</a>
+        <a class="link" href="https://vibertthio.com/portfolio/" target="_blank"
+          >More Details</a
+        >
       </p>
     </div>
 
@@ -81,41 +105,29 @@
         </p>
         <div id="edit-control-container">
           <button id="edit-play-btn">► play</button>
-          <button id="edit-send-btn">send</button>
-          <button id="edit-cancel-btn">cancel</button>
-          <button id="edit-clear-btn">clear</button>
-          <select>
-            <option value="1">preset 1</option>
-            <option value="2">preset 2</option>
-            <option value="3">preset 3</option>
-            <option value="4">preset 4</option>
+          <select id="preset-select">
+            <option value="0">preset 1</option>
+            <option value="1">preset 2</option>
+            <option value="2">preset 3</option>
+            <option value="3">preset 4</option>
           </select>
+          <button id="edit-clear-btn">clear</button>
+          <span>|</span>
+          <button id="edit-send-btn">SEND</button>
+          <button id="edit-cancel-btn">cancel</button>
         </div>
         <div id="edit-canvas-wrapper">
           <div id="edit-canvas-container">
             <p id="edit-canvas-text">🎹 riff</p>
             <div id="edit-loading-text-div">
               <p id="edit-loading-text">
-                loading...<br />
-                (this might take ~6 seconds or more)
+                loading
               </p>
+              <p id="edit-loading-text-server"></p>
             </div>
             <canvas id="edit-canvas"></canvas>
           </div>
         </div>
-
-        <!-- <div id="edit-control-container">
-          <button id="edit-play-btn">► play</button>
-          <button id="edit-send-btn">send</button>
-          <button id="edit-cancel-btn">cancel</button>
-          <button id="edit-clear-btn">clear</button>
-          <select>
-            <option value="1">preset 1</option>
-            <option value="2">preset 2</option>
-            <option value="3">preset 3</option>
-            <option value="4">preset 4</option>
-          </select>
-        </div> -->
       </div>
     </div>
     <div id="wrapper">
@@ -155,9 +167,11 @@
 
     <footer>
       <p>
-        <a href="https://ailabs.tw/">Taiwan AI Labs</a>,
-        <a href="https://remyhuang.github.io/">Remy</a>, and
-        <a href="https://vibertthio.com/portfolio/">Vibert</a>
+        <a class="link" target="_blank" href="https://ailabs.tw/">AILabs.tw</a>
+        +
+        <a class="link" target="_blank" href="https://vibertthio.com/portfolio/"
+          >Vibert</a
+        >
       </p>
     </footer>
   </body>
