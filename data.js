@@ -1224,6 +1224,7 @@ var data = [
     },
     output: {
       data: {
+				id: "0",
         engine_id: 0,
         pianoroll: [
           [
@@ -7320,6 +7321,7 @@ var data = [
     },
     output: {
       data: {
+				id: "1",
         engine_id: 1,
         pianoroll: [
           [
@@ -13416,6 +13418,7 @@ var data = [
     },
     output: {
       data: {
+				id: '2',
         engine_id: 1,
         pianoroll: [
           [
@@ -19512,6 +19515,7 @@ var data = [
     },
     output: {
       data: {
+				id: '3',
         pianoroll: [
           [
             0,

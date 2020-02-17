@@ -140,10 +140,21 @@
       </header>
       <div id="control-container">
         <div id="control-div">
-          <button id="play-btn">► play</button>
+          <div class="btn-div">
+            <button id="play-btn">
+              ► play
+            </button>
+            <span class="btn-tip" id="play-btn-tip">press to start</span>
+          </div>
           <button id="edit-btn">✏️edit</button>
+          <div class="btn-div">
+            <button class="disabled" id="share-btn">
+              share
+            </button>
+            <span class="btn-tip" id="share-btn-tip">link copied!</span>
+          </div>
         </div>
-        <span>|</span>
+        <span id="control-seperator">|</span>
         <div id="history-div">
           <span id="history-span"
             >history [<span id="history-current-index">1</span>/<span
@@ -151,8 +162,8 @@
               >1</span
             >]</span
           >
-          <button id="previous-btn">← previous</button>
-          <button id="next-btn">next →</button>
+          <button class="disabled" id="previous-btn">← previous</button>
+          <button class="disabled" id="next-btn">next →</button>
         </div>
       </div>
 

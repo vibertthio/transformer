@@ -207,6 +207,7 @@ select:hover {
   color: #373fff;
   padding: 0 1rem 0 1rem;
   background-color: #fff;
+  margin-bottom: 0.5rem;
 }
 #control-container button:hover {
   border: 1.5px solid;
@@ -215,8 +216,53 @@ select:hover {
   color: #fff;
   background-color: #373fff;
 }
+#control-container .disabled {
+  color: #ccc;
+  border-color: #ccc;
+  background-color: #fff;
+}
+#control-container .disabled:hover {
+  color: #ccc;
+  border-color: #ccc;
+  background-color: #fff;
+}
+#share-btn {
+  position: relative;
+}
+#control-container .btn-tip {
+  user-select: none;
+  position: absolute;
+  /* bottom: -3rem; */
+  top: -3rem;
+  /* left: -1.5rem; */
+  left: -2rem;
+  min-width: 7rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  color: #0f0;
+  background-color: #373fff;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;
+  font-size: 0.8rem;
+  text-align: center;
+}
+#control-container .btn-tip.show {
+  font-size: 0.8rem;
+  color: #0f0;
+  opacity: 1;
+  z-index: 2;
+}
+.btn-div {
+  display: inline;
+  position: relative;
+}
+
 #control-container span {
   color: #373fff;
+}
+#control-seperator {
+  margin: 0 1rem;
 }
 #history-div {
   position: relative;

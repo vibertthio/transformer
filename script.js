@@ -10,8 +10,10 @@ const SERVER_URL =
   "https://developer.ailabs.tw/ai-music-piano-transformer-service/api/";
 const POST_MIDI_URL = SERVER_URL + "getPianoMidi";
 const GET_SERVER_STATE_URL = SERVER_URL + "getJobQueueSize";
+const GET_MIDI_BY_ID = SERVER_URL + "getGeneratedMidi";
 
 const controlPlayButton = document.getElementById("play-btn");
+const playButtonTip = document.getElementById("play-btn-tip");
 const controlEditPlayButton = document.getElementById("edit-play-btn");
 const historyCurrentIndexElement = document.getElementById(
   "history-current-index"
@@ -19,6 +21,30 @@ const historyCurrentIndexElement = document.getElementById(
 const historyLenghtElement = document.getElementById("history-length");
 const history = [];
 let historyCurrentIndex = -1;
+
+// click board
+let clickboardUsable = false;
+navigator.permissions.query({ name: "clipboard-write" }).then(result => {
+  let timeId;
+  if (result.state == "granted" || result.state == "prompt") {
+    console.log("start using clickboard");
+    clickboardUsable = true;
+    const btn = document.getElementById("share-btn");
+    const tip = document.getElementById("share-btn-tip");
+    btn.classList.remove("disabled");
+    btn.addEventListener("click", async () => {
+      const url = `https://vibertthio.com/transformer/?id=${currentUrlId}`;
+      navigator.clipboard.writeText(url);
+      tip.classList.add("show");
+      if (timeId) {
+        clearInterval(timeId);
+      }
+      timeId = setTimeout(() => {
+        tip.classList.remove("show");
+      }, 500);
+    });
+  }
+});
 
 // events
 window.addEventListener("resize", () => {
@@ -33,13 +59,6 @@ window.addEventListener("resize", () => {
     editCanvas.height = editCanvasContainer.clientHeight;
     editCanvasRect = editCanvas.getBoundingClientRect();
   }
-});
-document.getElementById("splash-play-btn").addEventListener("click", () => {
-  const splash = document.getElementById("splash");
-  splash.style.opacity = 0;
-  setTimeout(() => {
-    splash.style.display = "none";
-  }, 300);
 });
 function startEditingMode() {
   const splash = document.getElementById("edit-splash");
@@ -74,6 +93,14 @@ document.getElementById("play-btn").addEventListener("click", () => {
     startMainSequencer();
   }
 });
+document.getElementById("play-btn").addEventListener("mouseenter", () => {
+  // console.log("in");
+  playButtonTip.classList.add("show");
+});
+document.getElementById("play-btn").addEventListener("mouseleave", () => {
+  // console.log("out");
+  playButtonTip.classList.remove("show");
+});
 document.getElementById("edit-play-btn").addEventListener("click", () => {
   if (waitingForResponse) {
     return;
@@ -98,7 +125,8 @@ document.getElementById("edit-send-btn").addEventListener("click", async () => {
       textElement.textContent = "loading";
     }
   }, 300);
-  const { average_runtime, num_engine, qsize, state } = await sendGetRequest();
+  const { data, state } = await sendGetRequest();
+  const { average_runtime, num_engine, qsize } = data;
   if (state === "success") {
     const el = document.getElementById("edit-loading-text-server");
     el.style.display = "block";
@@ -245,6 +273,13 @@ document.getElementById("preset-select").addEventListener("change", e => {
 });
 
 // methods
+function getUrlShareId() {
+  console.log("window.location.href", window.location.href);
+  const url = new URL(window.location.href);
+  const id = url.searchParams.get("id");
+  console.log("id", id);
+  return id;
+}
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
     method: "POST",
@@ -261,6 +296,24 @@ async function sendGetRequest(url = GET_SERVER_STATE_URL) {
   const response = await fetch(url);
   const d = await response.json();
   return d;
+}
+function getGeneratedMidiById(
+  url = GET_MIDI_BY_ID,
+  id = "ff6902d2-510c-11ea-845d-4e2c2ef0cf37"
+) {
+  // const response = await fetch(url, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json"
+  //   },
+  //   body: JSON.stringify({
+  //     id: id
+  //   })
+  // });
+  // const d = await response.json();
+  // console.log("response", d);
+  // return d;
+  return data[1].output;
 }
 function closeEditSplash() {
   const splash = document.getElementById("edit-splash");
@@ -523,6 +576,8 @@ function pushHistory() {
   historyCurrentIndex = history.length - 1;
   historyCurrentIndexElement.textContent = `${historyCurrentIndex + 1}`;
   historyLenghtElement.textContent = `${history.length}`;
+
+  traverseHistory(historyCurrentIndex);
 }
 function traverseHistory(index) {
   if (index < 0 || index >= history.length) {
@@ -534,6 +589,19 @@ function traverseHistory(index) {
   events = history[index].output.events;
   inputPianoroll = history[index].input.pianoroll;
   inputEvents = history[index].input.events;
+
+  const pb = document.getElementById("previous-btn");
+  const nb = document.getElementById("next-btn");
+  if (index === 0) {
+    pb.classList.add("disabled");
+  } else {
+    pb.classList.remove("disabled");
+  }
+  if (index === history.length - 1) {
+    nb.classList.add("disabled");
+  } else {
+    nb.classList.remove("disabled");
+  }
 }
 
 // audio
@@ -542,10 +610,35 @@ const audioContext = new Tone.Context();
 let editing = false;
 let waitingForResponse = false;
 
-let pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
-let events = getEventsTimelineFromMatrix(pianoroll);
-let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
-let inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+// let currentUrlId = data[INITIAL_DATA_INDEX].output.id;
+// let pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
+// let events = getEventsTimelineFromMatrix(pianoroll);
+// let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
+// let inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+
+let currentUrlId;
+let pianoroll;
+let events;
+let inputPianoroll;
+let inputEvents;
+
+const urlId = getUrlShareId();
+if (urlId !== null && urlId !== "0") {
+  currentUrlId = urlId;
+  const d = getGeneratedMidiById(GET_MIDI_BY_ID, urlId);
+  // console.log("d", d);
+  pianoroll = d.data.pianoroll;
+  events = getEventsTimelineFromMatrix(pianoroll);
+  inputPianoroll = pianoroll.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+} else {
+  currentUrlId = data[INITIAL_DATA_INDEX].output.data.id;
+  pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
+  events = getEventsTimelineFromMatrix(pianoroll);
+  inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
+  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+}
+
 pushHistory();
 
 // web soundfont
@@ -640,8 +733,17 @@ if (!canvas.getContext) {
   console.log("<canvas> not supported.");
 }
 
+document.getElementById("splash-play-btn").addEventListener("click", () => {
+  const splash = document.getElementById("splash");
+  splash.style.opacity = 0;
+  setTimeout(() => {
+    splash.style.display = "none";
+  }, 300);
+});
 StartAudioContext(audioContext, "#splash-play-btn", () => {
   setup();
   draw();
   // startMainSequencer();
 });
+
+getGeneratedMidiById();
