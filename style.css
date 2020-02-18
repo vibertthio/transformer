@@ -230,12 +230,14 @@ select:hover {
   position: relative;
 }
 #control-container .btn-tip {
+  /* display: none; */
   user-select: none;
   position: absolute;
   /* bottom: -3rem; */
   top: -3rem;
   /* left: -1.5rem; */
   left: -2rem;
+  /* width: 10rem; */
   min-width: 7rem;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
@@ -248,6 +250,7 @@ select:hover {
   text-align: center;
 }
 #control-container .btn-tip.show {
+  /* display: inline; */
   font-size: 0.8rem;
   color: #0f0;
   opacity: 1;
@@ -331,6 +334,40 @@ select:hover {
   opacity: 1;
 }
 
+/* share */
+#share-container {
+  position: relative;
+  /* flex-direction: row; */
+  /* align-items: center; */
+  max-width: 400px;
+  width: 90%;
+  justify-content: space-evenly;
+  margin: 2rem auto 2rem auto;
+  /* background-color: rgba(230, 230, 230, 1); */
+}
+#share-link-description {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #373fff;
+  /* border-radius: 1rem; */
+  /* border: 1.5px solid #373fff; */
+}
+#share-link {
+  font-size: 0.8rem;
+  background: #fff;
+  border: 1.5px solid #373fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0.5rem 1rem;
+  color: #aaa;
+  transition: color 0.1s;
+}
+#share-link:hover {
+  color: #000;
+}
+
 /* splash */
 #splash {
   /* display: none; */
@@ -355,6 +392,7 @@ select:hover {
   max-width: 40rem;
 }
 #splash .project-description {
+  margin-top: 0.5rem;
   margin-bottom: 2rem;
   line-height: 1.4rem;
 }
@@ -377,6 +415,10 @@ select:hover {
   border-color: #fff;
   color: #fff;
   background-color: #373fff;
+}
+#warning {
+  color: #aaa;
+  /* margin: 1rem; */
 }
 #left-corner {
   position: absolute;

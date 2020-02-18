@@ -23,28 +23,35 @@ const history = [];
 let historyCurrentIndex = -1;
 
 // click board
-let clickboardUsable = false;
-navigator.permissions.query({ name: "clipboard-write" }).then(result => {
-  let timeId;
-  if (result.state == "granted" || result.state == "prompt") {
-    console.log("start using clickboard");
-    clickboardUsable = true;
-    const btn = document.getElementById("share-btn");
-    const tip = document.getElementById("share-btn-tip");
-    btn.classList.remove("disabled");
-    btn.addEventListener("click", async () => {
-      const url = `https://vibertthio.com/transformer/?id=${currentUrlId}`;
-      navigator.clipboard.writeText(url);
-      tip.classList.add("show");
-      if (timeId) {
-        clearInterval(timeId);
-      }
-      timeId = setTimeout(() => {
-        tip.classList.remove("show");
-      }, 500);
-    });
-  }
-});
+// let clickboardUsable = false;
+// navigator.permissions.query({ name: "clipboard-write" }).then(
+//   result => {
+//     let timeId;
+//     if (result.state == "granted" || result.state == "prompt") {
+//       console.log("start using clickboard");
+//       clickboardUsable = true;
+//       const btn = document.getElementById("share-btn");
+//       const tip = document.getElementById("share-btn-tip");
+//       btn.classList.remove("disabled");
+//       btn.addEventListener("click", async () => {
+//         const url = `https://vibertthio.com/transformer/?id=${currentUrlId}`;
+//         navigator.clipboard.writeText(url);
+//         tip.classList.add("show");
+//         if (timeId) {
+//           clearInterval(timeId);
+//         }
+//         timeId = setTimeout(() => {
+//           tip.classList.remove("show");
+//         }, 500);
+//       });
+//     }
+//   },
+//   err => {
+//     let timeId;
+//     const btn = document.getElementById("share-btn");
+//     btn.style.display = "none";
+//   }
+// );
 
 // events
 window.addEventListener("resize", () => {
@@ -87,6 +94,19 @@ document.getElementById("edit-cancel-btn").addEventListener("click", () => {
   closeEditSplash();
 });
 document.getElementById("play-btn").addEventListener("click", () => {
+  // console.log("audio context state", audioContext.state);
+  if (audioContext.state == "suspended") {
+    console.log("audioContext.resume");
+    audioContext.resume();
+  }
+  // player.queueWaveTable(
+  //   audioContext,
+  //   audioContext.destination,
+  //   _tone_0000_JCLive_sf2_file,
+  //   audioContext.currentTime + ,
+  //   64,
+  //   0.4
+  // );
   if (sequencer.state === "started") {
     stopMainSequencer();
   } else {
@@ -146,6 +166,7 @@ document.getElementById("edit-send-btn").addEventListener("click", async () => {
   closeEditSplash();
 
   if (response.state === "success") {
+    currentUrlId = response.data.id;
     pianoroll = response.data.pianoroll;
     events = getEventsTimelineFromMatrix(pianoroll);
     pushHistory();
@@ -271,13 +292,21 @@ document.getElementById("preset-select").addEventListener("change", e => {
   const index = e.target.value;
   updateEditPianorollAndEvents(data[index].input.pianoroll);
 });
+document.getElementById("share-link").addEventListener("click", e => {
+  var range = document.createRange();
+  var selection = window.getSelection();
+  range.selectNodeContents(e.target);
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+});
 
 // methods
 function getUrlShareId() {
-  console.log("window.location.href", window.location.href);
+  // console.log("window.location.href", window.location.href);
   const url = new URL(window.location.href);
   const id = url.searchParams.get("id");
-  console.log("id", id);
+  // console.log("id", id);
   return id;
 }
 async function postData(url = "", data = {}) {
@@ -297,23 +326,15 @@ async function sendGetRequest(url = GET_SERVER_STATE_URL) {
   const d = await response.json();
   return d;
 }
-function getGeneratedMidiById(
+async function getGeneratedMidiById(
   url = GET_MIDI_BY_ID,
-  id = "ff6902d2-510c-11ea-845d-4e2c2ef0cf37"
+  id = "9269e648-5179-11ea-b4ea-4e2c2ef0cf37"
 ) {
-  // const response = await fetch(url, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   body: JSON.stringify({
-  //     id: id
-  //   })
-  // });
-  // const d = await response.json();
-  // console.log("response", d);
-  // return d;
-  return data[1].output;
+  const response = await fetch(`${url}?id=${id}`);
+  const d = await response.json();
+  console.log("response", d);
+  return d;
+  // return data[1].output;
 }
 function closeEditSplash() {
   const splash = document.getElementById("edit-splash");
@@ -523,10 +544,14 @@ function draw() {
   // do things
   if (!editing) {
     let ctx = canvas.getContext("2d");
-    drawPianoroll(ctx, events);
+    if (events) {
+      drawPianoroll(ctx, events);
+    }
   } else {
     let ctx = editCanvas.getContext("2d");
-    drawEditingPianoroll(ctx, inputEvents, inputPianoroll);
+    if (inputEvents) {
+      drawEditingPianoroll(ctx, inputEvents, inputPianoroll);
+    }
   }
 
   requestAnimationFrame(() => {
@@ -537,7 +562,8 @@ function stopMainSequencer(cancelEnvelopes = true) {
   controlPlayButton.textContent = "► play";
   beat = -1;
   sequencer.stop();
-  sequencer.cancel(audioContext.now());
+  // sequencer.cancel(audioContext.now());
+  sequencer.cancel(audioContext.currentTime);
   if (cancelEnvelopes) {
     envelopes.forEach(e => e.envelope.cancel());
   }
@@ -545,14 +571,17 @@ function stopMainSequencer(cancelEnvelopes = true) {
 }
 function startMainSequencer() {
   controlPlayButton.textContent = "stop";
-  sequencer.start(audioContext.now());
-  // sequencer.start();
+  // sequencer.start(audioContext.now());
+  sequencer.start(audioContext.currentTime);
+  // sequencer.start("+0.1");
 }
 function stopEditSequencer(cancelEnvelopes = true) {
   controlEditPlayButton.textContent = "► play";
   beat = -1;
   editSequencer.stop();
-  editSequencer.cancel(audioContext.now());
+  // editSequencer.cancel(audioContext.now());
+  editSequencer.cancel(audioContext.currentTime);
+  // editSequencer.cancel();
   if (cancelEnvelopes) {
     envelopes.forEach(e => e.envelope.cancel());
   }
@@ -560,7 +589,9 @@ function stopEditSequencer(cancelEnvelopes = true) {
 }
 function startEditSequencer() {
   controlEditPlayButton.textContent = "stop";
-  editSequencer.start(audioContext.now());
+  // editSequencer.start(audioContext.now());
+  editSequencer.start(audioContext.currentTime);
+  // editSequencer.start("+0.1");
 }
 function pushHistory() {
   history.push({
@@ -602,53 +633,46 @@ function traverseHistory(index) {
   } else {
     nb.classList.remove("disabled");
   }
+  updateShareLink();
+}
+function updateShareLink() {
+  document.getElementById(
+    "share-link"
+  ).textContent = `${location.protocol}//${location.host}${location.pathname}?id=${currentUrlId}`;
 }
 
 // audio
-const audioContext = new Tone.Context();
-// Tone.context = audioContext;
+// const audioContext = new Tone.Context();
+const AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+const audioContext = new AudioContextFunc();
 let editing = false;
 let waitingForResponse = false;
-
-// let currentUrlId = data[INITIAL_DATA_INDEX].output.id;
-// let pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
-// let events = getEventsTimelineFromMatrix(pianoroll);
-// let inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
-// let inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
-
+// UnmuteButton({
+//   container: document.querySelector("#wrapper"),
+//   title: "Web Audio",
+//   mute: false,
+//   context: audioContext
+// });
 let currentUrlId;
 let pianoroll;
 let events;
 let inputPianoroll;
 let inputEvents;
-
-const urlId = getUrlShareId();
-if (urlId !== null && urlId !== "0") {
-  currentUrlId = urlId;
-  const d = getGeneratedMidiById(GET_MIDI_BY_ID, urlId);
-  // console.log("d", d);
-  pianoroll = d.data.pianoroll;
-  events = getEventsTimelineFromMatrix(pianoroll);
-  inputPianoroll = pianoroll.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
-} else {
-  currentUrlId = data[INITIAL_DATA_INDEX].output.data.id;
-  pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
-  events = getEventsTimelineFromMatrix(pianoroll);
-  inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
-  inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
-}
-
-pushHistory();
+const initialUrlId = getUrlShareId();
 
 // web soundfont
+const selectedPreset = _tone_0000_JCLive_sf2_file;
 const player = new WebAudioFontPlayer();
-player.adjustPreset(audioContext, _tone_0000_JCLive_sf2_file);
+// player.adjustPreset(audioContext, selectedPreset);
+player.loader.decodeAfterLoading(audioContext, "_tone_0000_JCLive_sf2_file");
 const play = (time = 0, pitch = 55, length = 8, vol = 0.3) => {
+  // console.log("time", time);
+  // console.log("currentTime", audioContext.currentTime);
+  // console.log("pitch", pitch);
   return player.queueWaveTable(
     audioContext,
     audioContext.destination,
-    _tone_0000_JCLive_sf2_file,
+    selectedPreset,
     time,
     pitch,
     length,
@@ -677,7 +701,7 @@ const sequencer = new Tone.Sequence(
       });
     }
     if (b >= NUMBER_OF_BARS * NOTES_PER_BAR - 1) {
-      console.log(`b[${b}]: stop`);
+      // console.log(`b[${b}]: stop`);
       stopMainSequencer(false);
       // sequencer.stop();
       // sequencer.cancel(time);
@@ -733,17 +757,52 @@ if (!canvas.getContext) {
   console.log("<canvas> not supported.");
 }
 
-document.getElementById("splash-play-btn").addEventListener("click", () => {
-  const splash = document.getElementById("splash");
-  splash.style.opacity = 0;
-  setTimeout(() => {
-    splash.style.display = "none";
-  }, 300);
-});
-StartAudioContext(audioContext, "#splash-play-btn", () => {
+document
+  .getElementById("splash-play-btn")
+  .addEventListener("click", async e => {
+    e.target.textContent = "loading..";
+    if (
+      initialUrlId === null ||
+      initialUrlId === "0" ||
+      initialUrlId === "1" ||
+      initialUrlId === "2"
+    ) {
+      // console.log("load preset");
+      currentUrlId = data[INITIAL_DATA_INDEX].output.data.id;
+      pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
+      events = getEventsTimelineFromMatrix(pianoroll);
+      inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
+      inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+    } else {
+      currentUrlId = initialUrlId;
+      const d = await getGeneratedMidiById(GET_MIDI_BY_ID, initialUrlId);
+      if (d.state !== "success") {
+        // console.log("(wrong id) load preset");
+        currentUrlId = data[INITIAL_DATA_INDEX].output.data.id;
+        pianoroll = data[INITIAL_DATA_INDEX].output.data.pianoroll;
+        events = getEventsTimelineFromMatrix(pianoroll);
+        inputPianoroll = data[INITIAL_DATA_INDEX].input.pianoroll;
+        inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+      } else {
+        // console.log("load from server");
+        pianoroll = d.data.pianoroll;
+        events = getEventsTimelineFromMatrix(pianoroll);
+        inputPianoroll = pianoroll.slice(
+          0,
+          NUMBER_OF_INPUT_BARS * NOTES_PER_BAR
+        );
+        inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+      }
+    }
+    pushHistory();
+
+    const splash = document.getElementById("splash");
+    splash.style.opacity = 0;
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 300);
+  });
+StartAudioContext(audioContext, "#splash-play-btn", async () => {
   setup();
   draw();
-  // startMainSequencer();
 });
-
-getGeneratedMidiById();

@@ -38,6 +38,7 @@
 
     <!-- import the webpage's javascript file -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.5/Tone.min.js"></script>
+    <!-- <script src="https://unpkg.com/unmute" data-add-button="true"></script> -->
     <script src="https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js"></script>
     <script src="https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js"></script>
     <script src="./data.js"></script>
@@ -50,6 +51,7 @@
         <h1>Pop Music Transformer</h1>
 
         <h2>✍️ Riff → 🎵 Melody</h2>
+        <p id="warning">(Support desktop only.)</p>
         <p class="project-description">
           Join force with this AI to create music! Based on your input, the
           model can compose subsequent notes. Draw something to inspire the
@@ -147,12 +149,12 @@
             <span class="btn-tip" id="play-btn-tip">press to start</span>
           </div>
           <button id="edit-btn">✏️edit</button>
-          <div class="btn-div">
+          <!-- <div class="btn-div">
             <button class="disabled" id="share-btn">
               share
             </button>
             <span class="btn-tip" id="share-btn-tip">link copied!</span>
-          </div>
+          </div> -->
         </div>
         <span id="control-seperator">|</span>
         <div id="history-div">
@@ -174,6 +176,13 @@
           <canvas id="play-canvas"></canvas>
         </div>
       </div>
+    </div>
+
+    <div id="share-container">
+      <p id="share-link-description">
+        Copy the link below to share your result
+      </p>
+      <p id="share-link">https://vibertthio.com/transformer?id=0</p>
     </div>
 
     <footer>
