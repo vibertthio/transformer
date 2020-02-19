@@ -99,14 +99,6 @@ document.getElementById("play-btn").addEventListener("click", () => {
     console.log("audioContext.resume");
     audioContext.resume();
   }
-  // player.queueWaveTable(
-  //   audioContext,
-  //   audioContext.destination,
-  //   _tone_0000_JCLive_sf2_file,
-  //   audioContext.currentTime + ,
-  //   64,
-  //   0.4
-  // );
   if (sequencer.state === "started") {
     stopMainSequencer();
   } else {
@@ -812,3 +804,5 @@ Tone.Buffer.on("load", function() {
   pianoLoading = false;
   document.getElementById("splash-play-btn").classList.add("activated");
 });
+
+console.log("Vibert 2020-02-19 12:54");
