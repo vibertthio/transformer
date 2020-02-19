@@ -400,17 +400,24 @@ select:hover {
   outline: none;
   border: 1px solid;
   border-radius: 1.5rem;
-  border-color: #373fff;
+
   font-size: 1rem;
   /* height: 3px; */
   /* width: 100px; */
   height: 3rem;
   padding: 0 2rem 0 2rem;
-  color: #373fff;
-  background-color: #fff;
   margin-bottom: 2rem;
+
+  color: #ccc;
+  border-color: #ccc;
+  background-color: #fff;
 }
-#splash button:hover {
+#splash button.activated {
+  color: #373fff;
+  border-color: #373fff;
+  background-color: #fff;
+}
+#splash button.activated:hover {
   border: 1px solid;
   border-color: #fff;
   color: #fff;

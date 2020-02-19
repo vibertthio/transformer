@@ -302,6 +302,12 @@ document.getElementById("share-link").addEventListener("click", e => {
 });
 
 // methods
+function midi(m) {
+  return Tone.Frequency(m, "midi");
+}
+function toDb(value) {
+  return 20 * Math.log(1 - value);
+}
 function getUrlShareId() {
   // console.log("window.location.href", window.location.href);
   const url = new URL(window.location.href);
@@ -400,7 +406,8 @@ function drawPianoroll(ctx, events) {
 
   if (sequencer.state === "started") {
     ctx.fillStyle = "rgb(0, 200, 0)";
-    ctx.fillRect(width * sequencer.progress, 0, wUnit, height);
+    ctx.fillRect(width * sequencer.progress - wUnit, 0, wUnit, height);
+    // ctx.fillRect(beat * wUnit, 0, wUnit, height);
   }
 
   for (let col = 0; col < events.length; col++) {
@@ -432,7 +439,7 @@ function drawEditingPianoroll(ctx, events, matrix) {
 
   if (sequencer.state === "started") {
     ctx.fillStyle = "rgb(0, 200, 0)";
-    ctx.fillRect(width * sequencer.progress, 0, wUnit, height);
+    ctx.fillRect(width * sequencer.progress - wUnit, 0, wUnit, height);
   }
 
   for (let col = 0; col < NUMBER_OF_INPUT_BARS * NOTES_PER_BAR; col++) {
@@ -562,36 +569,37 @@ function stopMainSequencer(cancelEnvelopes = true) {
   controlPlayButton.textContent = "► play";
   beat = -1;
   sequencer.stop();
-  // sequencer.cancel(audioContext.now());
-  sequencer.cancel(audioContext.currentTime);
+  sequencer.cancel(audioContext.now());
   if (cancelEnvelopes) {
-    envelopes.forEach(e => e.envelope.cancel());
+    piano.volume.rampTo(-100, 0.5);
+    piano.releaseAll(audioContext.now());
+  } else {
+    // piano.volume.rampTo(-100, 5);
   }
-  envelopes = [];
 }
 function startMainSequencer() {
+  piano.releaseAll(audioContext.now());
   controlPlayButton.textContent = "stop";
-  // sequencer.start(audioContext.now());
-  sequencer.start(audioContext.currentTime);
-  // sequencer.start("+0.1");
+  piano.volume.rampTo(0, 0);
+  sequencer.start(audioContext.now());
 }
 function stopEditSequencer(cancelEnvelopes = true) {
   controlEditPlayButton.textContent = "► play";
   beat = -1;
   editSequencer.stop();
-  // editSequencer.cancel(audioContext.now());
-  editSequencer.cancel(audioContext.currentTime);
-  // editSequencer.cancel();
+  editSequencer.cancel(audioContext.now());
   if (cancelEnvelopes) {
-    envelopes.forEach(e => e.envelope.cancel());
+    piano.volume.rampTo(-100, 0.5);
+    piano.releaseAll();
+  } else {
+    // piano.volume.rampTo(-100, 5);
   }
-  envelopes = [];
 }
 function startEditSequencer() {
+  piano.releaseAll(audioContext.now());
   controlEditPlayButton.textContent = "stop";
-  // editSequencer.start(audioContext.now());
-  editSequencer.start(audioContext.currentTime);
-  // editSequencer.start("+0.1");
+  piano.volume.rampTo(0, 0);
+  editSequencer.start(audioContext.now());
 }
 function pushHistory() {
   history.push({
@@ -600,6 +608,7 @@ function pushHistory() {
       events: inputEvents
     },
     output: {
+      id: currentUrlId,
       pianoroll: pianoroll,
       events: events
     }
@@ -616,6 +625,7 @@ function traverseHistory(index) {
   }
   historyCurrentIndexElement.textContent = `${index + 1}`;
   historyCurrentIndex = index;
+  currentUrlId = history[index].output.id;
   pianoroll = history[index].output.pianoroll;
   events = history[index].output.events;
   inputPianoroll = history[index].input.pianoroll;
@@ -643,15 +653,16 @@ function updateShareLink() {
 
 // audio
 // const audioContext = new Tone.Context();
-const AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-const audioContext = new AudioContextFunc();
+// const AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+// const audioContext = new AudioContextFunc();
+const audioContext = Tone.context;
 let editing = false;
 let waitingForResponse = false;
 // UnmuteButton({
 //   container: document.querySelector("#wrapper"),
 //   title: "Web Audio",
 //   mute: false,
-//   context: audioContext
+//   context: Tone.context
 // });
 let currentUrlId;
 let pianoroll;
@@ -659,28 +670,20 @@ let events;
 let inputPianoroll;
 let inputEvents;
 const initialUrlId = getUrlShareId();
+let pianoLoading = true;
 
-// web soundfont
-const selectedPreset = _tone_0000_JCLive_sf2_file;
-const player = new WebAudioFontPlayer();
-// player.adjustPreset(audioContext, selectedPreset);
-player.loader.decodeAfterLoading(audioContext, "_tone_0000_JCLive_sf2_file");
 const play = (time = 0, pitch = 55, length = 8, vol = 0.3) => {
   // console.log("time", time);
   // console.log("currentTime", audioContext.currentTime);
   // console.log("pitch", pitch);
-  return player.queueWaveTable(
-    audioContext,
-    audioContext.destination,
-    selectedPreset,
+  piano.triggerAttackRelease(
+    Tone.Frequency(pitch, "midi"),
+    length * 0.5,
     time,
-    pitch,
-    length,
     vol
   );
 };
 let beat = -1;
-let envelopes = [];
 
 const continuousArray = Array(NUMBER_OF_BARS * NOTES_PER_BAR)
   .fill(null)
@@ -688,23 +691,16 @@ const continuousArray = Array(NUMBER_OF_BARS * NOTES_PER_BAR)
 const sequencer = new Tone.Sequence(
   (time, b) => {
     // console.log(`b[${b}]`);
-    envelopes = envelopes.filter(env => env.end >= b);
     beat = b;
     const es = events[b];
     if (es) {
       es.forEach(({ note, length }) => {
-        const env = play(time, note + NUMBER_OF_NOTES, length * 0.2);
-        envelopes.push({
-          end: b + length,
-          envelope: env
-        });
+        play(time, note + NUMBER_OF_NOTES, length * 0.2);
       });
     }
     if (b >= NUMBER_OF_BARS * NOTES_PER_BAR - 1) {
       // console.log(`b[${b}]: stop`);
       stopMainSequencer(false);
-      // sequencer.stop();
-      // sequencer.cancel(time);
       beat = -1;
     }
   },
@@ -716,21 +712,16 @@ const sequencer = new Tone.Sequence(
 // let editEnvelopes = [];
 const editSequencer = new Tone.Sequence(
   (time, b) => {
-    envelopes = envelopes.filter(env => env.end >= b);
     beat = b;
     const es = inputEvents[b];
     if (es) {
       es.forEach(({ note, length }) => {
         const env = play(time, note + NUMBER_OF_NOTES, length * 0.2);
-        envelopes.push({
-          end: b + length,
-          envelope: env
-        });
       });
     }
     if (EDIT_LOOP) {
       if (b >= NUMBER_OF_INPUT_BARS * NOTES_PER_BAR - 1) {
-        console.log(`b[${NUMBER_OF_INPUT_BARS * NOTES_PER_BAR}]: stop`);
+        console.log(`b[${NUMBER_OF_INPUT_BARS * NOTES_PER_BAR - 1}]: stop`);
         stopEditSequencer(false);
         beat = -1;
       }
@@ -760,6 +751,10 @@ if (!canvas.getContext) {
 document
   .getElementById("splash-play-btn")
   .addEventListener("click", async e => {
+    if (pianoLoading) {
+      return;
+    }
+
     e.target.textContent = "loading..";
     if (
       initialUrlId === null ||
@@ -805,4 +800,15 @@ document
 StartAudioContext(audioContext, "#splash-play-btn", async () => {
   setup();
   draw();
+});
+
+var piano = SampleLibrary.load({
+  instruments: "piano"
+});
+Tone.Buffer.on("load", function() {
+  piano.sync();
+  const reverb = new Tone.JCReverb(0.5).toMaster();
+  piano.connect(reverb);
+  pianoLoading = false;
+  document.getElementById("splash-play-btn").classList.add("activated");
 });
