@@ -1,3 +1,8 @@
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if (isMobile) {
+  console.log("[mobile]");
+}
+
 const EDIT_LOOP = true;
 const BPM = 120;
 const INITIAL_DATA_INDEX = 0;
@@ -21,37 +26,6 @@ const historyCurrentIndexElement = document.getElementById(
 const historyLenghtElement = document.getElementById("history-length");
 const history = [];
 let historyCurrentIndex = -1;
-
-// click board
-// let clickboardUsable = false;
-// navigator.permissions.query({ name: "clipboard-write" }).then(
-//   result => {
-//     let timeId;
-//     if (result.state == "granted" || result.state == "prompt") {
-//       console.log("start using clickboard");
-//       clickboardUsable = true;
-//       const btn = document.getElementById("share-btn");
-//       const tip = document.getElementById("share-btn-tip");
-//       btn.classList.remove("disabled");
-//       btn.addEventListener("click", async () => {
-//         const url = `https://vibertthio.com/transformer/?id=${currentUrlId}`;
-//         navigator.clipboard.writeText(url);
-//         tip.classList.add("show");
-//         if (timeId) {
-//           clearInterval(timeId);
-//         }
-//         timeId = setTimeout(() => {
-//           tip.classList.remove("show");
-//         }, 500);
-//       });
-//     }
-//   },
-//   err => {
-//     let timeId;
-//     const btn = document.getElementById("share-btn");
-//     btn.style.display = "none";
-//   }
-// );
 
 // events
 window.addEventListener("resize", () => {
@@ -94,7 +68,7 @@ document.getElementById("edit-cancel-btn").addEventListener("click", () => {
   closeEditSplash();
 });
 document.getElementById("play-btn").addEventListener("click", () => {
-  // console.log("audio context state", audioContext.state);
+  console.log("audio context state", audioContext.state);
   if (audioContext.state == "suspended") {
     console.log("audioContext.resume");
     audioContext.resume();
@@ -105,14 +79,16 @@ document.getElementById("play-btn").addEventListener("click", () => {
     startMainSequencer();
   }
 });
-document.getElementById("play-btn").addEventListener("mouseenter", () => {
-  // console.log("in");
-  playButtonTip.classList.add("show");
-});
-document.getElementById("play-btn").addEventListener("mouseleave", () => {
-  // console.log("out");
-  playButtonTip.classList.remove("show");
-});
+!isMobile &&
+  document.getElementById("play-btn").addEventListener("mouseenter", () => {
+    // console.log("in");
+    playButtonTip.classList.add("show");
+  });
+!isMobile &&
+  document.getElementById("play-btn").addEventListener("mouseleave", () => {
+    // console.log("out");
+    playButtonTip.classList.remove("show");
+  });
 document.getElementById("edit-play-btn").addEventListener("click", () => {
   if (waitingForResponse) {
     return;
@@ -398,8 +374,8 @@ function drawPianoroll(ctx, events) {
 
   if (sequencer.state === "started") {
     ctx.fillStyle = "rgb(0, 200, 0)";
-    ctx.fillRect(width * sequencer.progress - wUnit, 0, wUnit, height);
-    // ctx.fillRect(beat * wUnit, 0, wUnit, height);
+    // ctx.fillRect(width * sequencer.progress - wUnit, 0, wUnit, height);
+    ctx.fillRect(beat * wUnit, 0, wUnit, height);
   }
 
   for (let col = 0; col < events.length; col++) {
@@ -428,11 +404,6 @@ function drawEditingPianoroll(ctx, events, matrix) {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgba(230, 230, 230, 1)";
   ctx.fillRect(0, 0, width, height);
-
-  if (sequencer.state === "started") {
-    ctx.fillStyle = "rgb(0, 200, 0)";
-    ctx.fillRect(width * sequencer.progress - wUnit, 0, wUnit, height);
-  }
 
   for (let col = 0; col < NUMBER_OF_INPUT_BARS * NOTES_PER_BAR; col++) {
     ctx.beginPath();
@@ -471,7 +442,8 @@ function drawEditingPianoroll(ctx, events, matrix) {
 
   if (editSequencer.state === "started") {
     ctx.fillStyle = "rgb(0, 200, 0)";
-    ctx.fillRect(width * editSequencer.progress, 0, wUnit * 0.3, height);
+    // ctx.fillRect(width * editSequencer.progress, 0, wUnit * 0.3, height);
+    ctx.fillRect(beat * wUnit, 0, wUnit * 0.2, height);
   }
 
   if (!mouseEditing) {
@@ -570,10 +542,13 @@ function stopMainSequencer(cancelEnvelopes = true) {
   }
 }
 function startMainSequencer() {
+  console.log("start time", audioContext.now());
   piano.releaseAll(audioContext.now());
+  // piano.releaseAll();
   controlPlayButton.textContent = "stop";
   piano.volume.rampTo(0, 0);
   sequencer.start(audioContext.now());
+  // sequencer.start();
 }
 function stopEditSequencer(cancelEnvelopes = true) {
   controlEditPlayButton.textContent = "► play";
@@ -666,7 +641,7 @@ let pianoLoading = true;
 
 const play = (time = 0, pitch = 55, length = 8, vol = 0.3) => {
   // console.log("time", time);
-  // console.log("currentTime", audioContext.currentTime);
+  // console.log("play currentTime", audioContext.now());
   // console.log("pitch", pitch);
   piano.triggerAttackRelease(
     Tone.Frequency(pitch, "midi"),
@@ -675,14 +650,11 @@ const play = (time = 0, pitch = 55, length = 8, vol = 0.3) => {
     vol
   );
 };
-let beat = -1;
 
-const continuousArray = Array(NUMBER_OF_BARS * NOTES_PER_BAR)
-  .fill(null)
-  .map((_, i) => i);
+let beat = -1;
 const sequencer = new Tone.Sequence(
   (time, b) => {
-    // console.log(`b[${b}]`);
+    // console.log(`b[${b}], time: ${time}`);
     beat = b;
     const es = events[b];
     if (es) {
@@ -696,12 +668,13 @@ const sequencer = new Tone.Sequence(
       beat = -1;
     }
   },
-  continuousArray,
+  Array(NUMBER_OF_BARS * NOTES_PER_BAR)
+    .fill(null)
+    .map((_, i) => i),
   "16n"
 );
 
 // let editBeat = -1;
-// let editEnvelopes = [];
 const editSequencer = new Tone.Sequence(
   (time, b) => {
     beat = b;
@@ -743,6 +716,11 @@ if (!canvas.getContext) {
 document
   .getElementById("splash-play-btn")
   .addEventListener("click", async e => {
+    if (audioContext.state == "suspended") {
+      console.log("audioContext.resume");
+      audioContext.resume();
+    }
+
     if (pianoLoading) {
       return;
     }
@@ -783,26 +761,30 @@ document
     }
     pushHistory();
 
+    document.getElementById("wrapper").style.visibility = "visible";
     const splash = document.getElementById("splash");
     splash.style.opacity = 0;
     setTimeout(() => {
       splash.style.display = "none";
     }, 300);
+
+    setup();
+    draw();
   });
-StartAudioContext(audioContext, "#splash-play-btn", async () => {
-  setup();
-  draw();
-});
+// StartAudioContext(audioContext, "#splash-play-btn", async () => {
+//   console.log("audio context started");
+// });
 
 var piano = SampleLibrary.load({
   instruments: "piano"
 });
 Tone.Buffer.on("load", function() {
-  piano.sync();
+  // piano.sync();
   const reverb = new Tone.JCReverb(0.5).toMaster();
   piano.connect(reverb);
   pianoLoading = false;
   document.getElementById("splash-play-btn").classList.add("activated");
+  console.log("Samples loaded");
 });
 
 console.log("Vibert 2020-02-19 12:54");
