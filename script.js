@@ -79,16 +79,16 @@ document.getElementById("play-btn").addEventListener("click", () => {
     startMainSequencer();
   }
 });
-!isMobile &&
-  document.getElementById("play-btn").addEventListener("mouseenter", () => {
-    // console.log("in");
-    playButtonTip.classList.add("show");
-  });
-!isMobile &&
-  document.getElementById("play-btn").addEventListener("mouseleave", () => {
-    // console.log("out");
-    playButtonTip.classList.remove("show");
-  });
+// !isMobile &&
+//   document.getElementById("play-btn").addEventListener("mouseenter", () => {
+//     // console.log("in");
+//     playButtonTip.classList.add("show");
+//   });
+// !isMobile &&
+//   document.getElementById("play-btn").addEventListener("mouseleave", () => {
+//     // console.log("out");
+//     playButtonTip.classList.remove("show");
+//   });
 document.getElementById("edit-play-btn").addEventListener("click", () => {
   if (waitingForResponse) {
     return;

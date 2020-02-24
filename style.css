@@ -182,7 +182,10 @@ select:hover {
   background-color: #373fff;
 }
 #edit-send-btn {
-  font-weight: bold;
+  /* font-weight: bold; */
+}
+#edit-control-seperator {
+  color: #fff;
 }
 
 /* controls */
@@ -527,6 +530,83 @@ footer p {
   }
   #control-container button:hover {
     border-color: #373fff;
+    color: #373fff;
+    background-color: #fff;
+  }
+  #wrapper {
+  }
+
+  #canvas-text {
+    font-size: 0.7rem;
+    bottom: 0rem;
+    right: 0.5rem;
+    padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+  }
+  #canvas-text-left {
+    font-size: 0.7rem;
+    bottom: 0rem;
+    left: 0.5rem;
+    padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+  }
+  #edit-splash {
+    display: none;
+    opacity: 0;
+    position: absolute;
+    /* top: -200vh; */
+    top: 0;
+    left: 0;
+    margin: 0;
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s ease 0s;
+    /* transition: top 0.5s; */
+  }
+  #edit-splash-container {
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.2),
+      0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    width: 95%;
+    max-width: 700px;
+    /* background-color: rgba(94, 167, 255, 0.9); */
+    background-color: rgba(112, 118, 255, 0.8);
+    padding: 1rem 0 2rem 0;
+    margin: 5vh auto 0 auto;
+    border-radius: 1rem;
+  }
+  #edit-splash-container h1 {
+    color: #fff;
+    font-size: 1.5rem;
+    /* background-color: rgba(230, 230, 230, 1); */
+    /* width: 10rem; */
+    margin: 0 auto 0.5rem auto;
+    padding: 0 1rem 0 1rem;
+  }
+  #edit-control-container button,
+  select {
+    border: none;
+    outline: none;
+    /* border: 2px solid; */
+    border-radius: 0.8rem;
+    /* border-color: #373fff; */
+    font-size: 0.6rem;
+    /* width: 5rem; */
+    padding: 0 0.8rem 0 0.8rem;
+    height: 1.6rem;
+    color: #373fff;
+    background-color: #fff;
+  }
+  #edit-control-container button:hover,
+  select:hover {
+    border: none;
+    outline: none;
+    /* border: 2px solid; */
+    border-radius: 0.8rem;
+    /* border-color: #373fff; */
+    font-size: 0.6rem;
+    /* width: 5rem; */
+    padding: 0 0.8rem 0 0.8rem;
+    height: 1.6rem;
     color: #373fff;
     background-color: #fff;
   }
