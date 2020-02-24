@@ -170,28 +170,63 @@ document.getElementById("edit-clear-btn").addEventListener("click", () => {
   inputPianoroll = inputPianoroll.map(c => c.map(e => 0));
   inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
 });
-document
-  .getElementById("edit-splash-container")
-  .addEventListener("mousemove", e => {
-    if (waitingForResponse) {
-      return;
-    }
-    const { clientX, clientY } = e;
-    const { width, height } = editCanvas;
-    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-    const hUnit = height / NUMBER_OF_NOTES;
 
-    mousePosition.x = clientX - editCanvasRect.left;
-    mousePosition.y = clientY - editCanvasRect.top;
-    // const x = Math.floor(mousePosition.x / wUnit);
-    // const y = Math.floor(mousePosition.y / hUnit);
-    const x = Math.floor(mousePosition.x / wUnit - 0.5);
-    const y = Math.floor(mousePosition.y / hUnit - 0.5);
+if (isMobile) {
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("touchmove", e => {
+      console.log("touch move");
+      if (waitingForResponse) {
+        return;
+      }
+      const { clientX, clientY } = e.touches[0];
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
 
-    // console.log(`[x]${x} [y]${y}`);
+      mousePosition.x = clientX - editCanvasRect.left;
+      mousePosition.y = clientY - editCanvasRect.top;
+      // const x = Math.floor(mousePosition.x / wUnit);
+      // const y = Math.floor(mousePosition.y / hUnit);
+      const x = Math.floor(mousePosition.x / wUnit - 0.5);
+      const y = Math.floor(mousePosition.y / hUnit - 0.5);
 
-    if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
+      // console.log(`[x]${x} [y]${y}`);
+
+      if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
+        const row = NUMBER_OF_NOTES - y - 1;
+        if (
+          x < inputPianoroll.length &&
+          x >= 0 &&
+          row >= 0 &&
+          row < inputPianoroll[0].length
+        ) {
+          inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
+        }
+      }
+      mouseEditIndex.x = x;
+      mouseEditIndex.y = y;
+    });
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("touchstart", e => {
+      console.log("touch start");
+      if (waitingForResponse) {
+        return;
+      }
+      mouseEditing = true;
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
+
+      const { clientX, clientY } = e.touches[0];
+      mousePosition.x = clientX - editCanvasRect.left;
+      mousePosition.y = clientY - editCanvasRect.top;
+      const x = Math.floor(mousePosition.x / wUnit - 0.5);
+      const y = Math.floor(mousePosition.y / hUnit - 0.5);
+
       const row = NUMBER_OF_NOTES - y - 1;
+
       if (
         x < inputPianoroll.length &&
         x >= 0 &&
@@ -200,62 +235,120 @@ document
       ) {
         inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
       }
-    }
-    mouseEditIndex.x = x;
-    mouseEditIndex.y = y;
-  });
-document
-  .getElementById("edit-splash-container")
-  .addEventListener("mousedown", e => {
-    if (waitingForResponse) {
-      return;
-    }
-    mouseEditing = true;
-    const { width, height } = editCanvas;
-    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-    const hUnit = height / NUMBER_OF_NOTES;
 
-    const { clientX, clientY } = e;
-    mousePosition.x = clientX - editCanvasRect.left;
-    mousePosition.y = clientY - editCanvasRect.top;
-    const x = Math.floor(mousePosition.x / wUnit - 0.5);
-    const y = Math.floor(mousePosition.y / hUnit - 0.5);
+      mouseEditIndex.x = x;
+      mouseEditIndex.y = y;
 
-    const row = NUMBER_OF_NOTES - y - 1;
+      // console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+    });
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("touchend", e => {
+      console.log("touch end");
+      if (waitingForResponse) {
+        return;
+      }
+      mouseEditing = false;
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
 
-    if (
-      x < inputPianoroll.length &&
-      x >= 0 &&
-      row >= 0 &&
-      row < inputPianoroll[0].length
-    ) {
-      inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
-    }
+      // const { clientX, clientY } = e.touches[0];
+      // mousePosition.x = clientX - editCanvasRect.left;
+      // mousePosition.y = clientY - editCanvasRect.top;
+      // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
+      // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
+      // console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+      inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+    });
+} else {
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("mousemove", e => {
+      if (waitingForResponse) {
+        return;
+      }
+      const { clientX, clientY } = e;
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
 
-    mouseEditIndex.x = x;
-    mouseEditIndex.y = y;
+      mousePosition.x = clientX - editCanvasRect.left;
+      mousePosition.y = clientY - editCanvasRect.top;
+      // const x = Math.floor(mousePosition.x / wUnit);
+      // const y = Math.floor(mousePosition.y / hUnit);
+      const x = Math.floor(mousePosition.x / wUnit - 0.5);
+      const y = Math.floor(mousePosition.y / hUnit - 0.5);
 
-    // console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
-  });
-document
-  .getElementById("edit-splash-container")
-  .addEventListener("mouseup", e => {
-    if (waitingForResponse) {
-      return;
-    }
-    mouseEditing = false;
-    const { width, height } = editCanvas;
-    const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
-    const hUnit = height / NUMBER_OF_NOTES;
+      // console.log(`[x]${x} [y]${y}`);
 
-    const { clientX, clientY } = e;
-    mousePosition.x = clientX - editCanvasRect.left;
-    mousePosition.y = clientY - editCanvasRect.top;
-    // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
-    // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
-    // console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
-    inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
-  });
+      if (mouseEditing && (x !== mouseEditIndex.x || y !== mouseEditIndex.y)) {
+        const row = NUMBER_OF_NOTES - y - 1;
+        if (
+          x < inputPianoroll.length &&
+          x >= 0 &&
+          row >= 0 &&
+          row < inputPianoroll[0].length
+        ) {
+          inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
+        }
+      }
+      mouseEditIndex.x = x;
+      mouseEditIndex.y = y;
+    });
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("mousedown", e => {
+      if (waitingForResponse) {
+        return;
+      }
+      mouseEditing = true;
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
+
+      const { clientX, clientY } = e;
+      mousePosition.x = clientX - editCanvasRect.left;
+      mousePosition.y = clientY - editCanvasRect.top;
+      const x = Math.floor(mousePosition.x / wUnit - 0.5);
+      const y = Math.floor(mousePosition.y / hUnit - 0.5);
+
+      const row = NUMBER_OF_NOTES - y - 1;
+
+      if (
+        x < inputPianoroll.length &&
+        x >= 0 &&
+        row >= 0 &&
+        row < inputPianoroll[0].length
+      ) {
+        inputPianoroll[x][row] = 1 - inputPianoroll[x][row];
+      }
+
+      mouseEditIndex.x = x;
+      mouseEditIndex.y = y;
+
+      // console.log(`mouse down: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+    });
+  document
+    .getElementById("edit-splash-container")
+    .addEventListener("mouseup", e => {
+      if (waitingForResponse) {
+        return;
+      }
+      mouseEditing = false;
+      const { width, height } = editCanvas;
+      const wUnit = width / (NUMBER_OF_INPUT_BARS * NOTES_PER_BAR);
+      const hUnit = height / NUMBER_OF_NOTES;
+
+      const { clientX, clientY } = e;
+      mousePosition.x = clientX - editCanvasRect.left;
+      mousePosition.y = clientY - editCanvasRect.top;
+      // mouseEditIndex.x = Math.floor(mousePosition.x / wUnit);
+      // mouseEditIndex.y = Math.floor(mousePosition.y / hUnit);
+      // console.log(`mouse up: x ${mouseEditIndex.x} y ${mouseEditIndex.y}`);
+      inputEvents = getEventsTimelineFromMatrix(inputPianoroll);
+    });
+}
 document.getElementById("preset-select").addEventListener("change", e => {
   const index = e.target.value;
   updateEditPianorollAndEvents(data[index].input.pianoroll);
