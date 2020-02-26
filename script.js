@@ -11,6 +11,7 @@ const NUMBER_OF_BARS = 8;
 const NUMBER_OF_INPUT_BARS = 2;
 const NOTE_EXTENSION = 15;
 const NOTES_PER_BAR = 16;
+// const SERVER_URL = " http://musicai.citi.sinica.edu.tw/remi_piano/";
 const SERVER_URL =
   "https://developer.ailabs.tw/ai-music-piano-transformer-service/api/";
 const POST_MIDI_URL = SERVER_URL + "getPianoMidi";
@@ -113,14 +114,14 @@ document.getElementById("edit-send-btn").addEventListener("click", async () => {
       textElement.textContent = "loading";
     }
   }, 300);
-  const { data, state } = await sendGetRequest();
-  const { average_runtime, num_engine, qsize } = data;
-  if (state === "success") {
-    const el = document.getElementById("edit-loading-text-server");
-    el.style.display = "block";
-    el.textContent = `It takes ~${average_runtime} seconds.
-		There are ${qsize} tasks in queue on ${num_engine} engines.`;
-  }
+  // const { data, state } = await sendGetRequest();
+  // const { average_runtime, num_engine, qsize } = data;
+  // if (state === "success") {
+  //   const el = document.getElementById("edit-loading-text-server");
+  //   el.style.display = "block";
+  //   el.textContent = `It takes ~${average_runtime} seconds.
+  // 	There are ${qsize} tasks in queue on ${num_engine} engines.`;
+  // }
   const response = await postData(POST_MIDI_URL, {
     pianoroll: inputPianoroll,
     n_bar: 6,
@@ -379,6 +380,7 @@ function getUrlShareId() {
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
     method: "POST",
+    // mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
