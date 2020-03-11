@@ -924,7 +924,7 @@ document
           input: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
           output: p
         };
-        pushNewDataToHistory(data[i]);
+        pushNewDataToHistory(d);
       });
       document.getElementById("total-number").textContent =
         response.data.num_current_sample;
