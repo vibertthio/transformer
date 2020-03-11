@@ -718,10 +718,10 @@ function pushHistory() {
 
   traverseHistory(historyCurrentIndex);
 }
-function pushNewDataToHistory(d) {
-  const p = d.output.data.pianoroll;
+function pushNewDataToHistory(d, local = true) {
+  const p = local ? d.output.data.pianoroll : d.output;
   const es = getEventsTimelineFromMatrix(p);
-  const ip = d.input.pianoroll;
+  const ip = local ? d.input.pianoroll : d.input;
   const ies = getEventsTimelineFromMatrix(ip);
   history.push({
     input: {
@@ -921,12 +921,8 @@ document
     } else {
       response.data.pianoroll.forEach(p => {
         const d = {
-          input: {
-            pianoroll: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
-          },
-          output: {
-            pianoroll: p,
-          }
+          input: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
+          output: p
         };
         pushNewDataToHistory(d);
       });
