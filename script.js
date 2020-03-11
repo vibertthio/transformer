@@ -921,8 +921,12 @@ document
     } else {
       response.data.pianoroll.forEach(p => {
         const d = {
-          input: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
-          output: p
+          input: {
+            pianoroll: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
+          },
+          output: {
+            pianoroll: p,
+          }
         };
         pushNewDataToHistory(d);
       });
