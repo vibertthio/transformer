@@ -924,7 +924,7 @@ document
           input: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
           output: p
         };
-        pushNewDataToHistory(d);
+        pushNewDataToHistory(d, false);
       });
       document.getElementById("total-number").textContent =
         response.data.num_current_sample;
@@ -956,4 +956,4 @@ Tone.Buffer.on("load", function() {
   console.log("Samples loaded");
 });
 
-console.log("Vibert 2020-03-11 16:27");
+console.log("Vibert 2020-03-11 16:35");
