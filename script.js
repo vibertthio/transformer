@@ -71,9 +71,9 @@ document.getElementById("edit-cancel-btn").addEventListener("click", () => {
   closeEditSplash();
 });
 document.getElementById("play-btn").addEventListener("click", () => {
-  console.log("audio context state", audioContext.state);
+  // console.log("audio context state", audioContext.state);
   if (audioContext.state == "suspended") {
-    console.log("audioContext.resume");
+    // console.log("audioContext.resume");
     audioContext.resume();
   }
   if (sequencer.state === "started") {
@@ -84,7 +84,7 @@ document.getElementById("play-btn").addEventListener("click", () => {
 });
 document.getElementById("play-again-btn").addEventListener("click", e => {
   if (audioContext.state == "suspended") {
-    console.log("audioContext.resume");
+    // console.log("audioContext.resume");
     audioContext.resume();
   }
   startMainSequencer();
@@ -92,7 +92,7 @@ document.getElementById("play-again-btn").addEventListener("click", e => {
 });
 document.getElementById("play-next-btn").addEventListener("click", e => {
   if (audioContext.state == "suspended") {
-    console.log("audioContext.resume");
+    // console.log("audioContext.resume");
     audioContext.resume();
   }
   if (historyCurrentIndex < history.length - 1) {
@@ -428,14 +428,14 @@ async function getGeneratedMidiById(
 ) {
   const response = await fetch(`${url}?id=${id}`);
   const d = await response.json();
-  console.log("response", d);
+  // console.log("response", d);
   return d;
   // return data[1].output;
 }
 async function getRandomMidis(url = GET_RANDOM_MIDI, n = 5) {
   const response = await fetch(`${url}?num_sample=${n}`);
   const d = await response.json();
-  console.log("response", d);
+  // console.log("response", d);
   return d;
 }
 function closeEditSplash() {
@@ -674,7 +674,7 @@ function stopMainSequencer(cancelEnvelopes = true, showPanel = true) {
   }
 }
 function startMainSequencer() {
-  console.log("start time", audioContext.now());
+  // console.log("start time", audioContext.now());
   // piano.releaseAll(audioContext.now());
   piano.releaseAll("+0.05");
   controlPlayButton.textContent = "stop";
