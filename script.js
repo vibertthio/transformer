@@ -47,7 +47,8 @@ function startEditingMode() {
   const splash = document.getElementById("edit-splash");
   splash.style.display = "block";
   // splash.style.opacity = 0;
-  stopMainSequencer();
+  stopMainSequencer(true, false);
+  document.getElementById("panel-container").style.display = "none";
   setTimeout(() => {
     splash.style.opacity = 1;
     editCanvasRect = editCanvas.getBoundingClientRect();
@@ -155,6 +156,7 @@ document.getElementById("edit-send-btn").addEventListener("click", async () => {
 
   document.getElementById("edit-loading-text-div").style.display = "none";
   closeEditSplash();
+  startMainSequencer();
 
   if (response.state === "success") {
     currentUrlId = response.data.id;
@@ -655,7 +657,7 @@ function draw() {
     draw();
   });
 }
-function stopMainSequencer(cancelEnvelopes = true) {
+function stopMainSequencer(cancelEnvelopes = true, showPanel = true) {
   controlPlayButton.textContent = "► play";
   beat = -1;
   sequencer.stop();
@@ -667,7 +669,9 @@ function stopMainSequencer(cancelEnvelopes = true) {
     // piano.volume.rampTo(-100, 5);
   }
 
-  document.getElementById("panel-container").style.display = "flex";
+  if (showPanel) {
+    document.getElementById("panel-container").style.display = "flex";
+  }
 }
 function startMainSequencer() {
   console.log("start time", audioContext.now());
