@@ -62,7 +62,14 @@
             target="_blank"
             >paper</a
           >
-          if you are interested in the model.
+          if you are interested in the model. Or, download the
+          <a
+            class="link"
+            href="https://apps.apple.com/tw/app/yating-live-music-ai-music/id1446684616?l=en"
+            target="_blank"
+            >iOS App</a
+          >
+          for more such music
         </p>
         <button id="splash-play-btn">► play</button>
         <p>
@@ -143,8 +150,11 @@
         <h1>Pop Music Transformer</h1>
         <p id="response-info">
           Give the model your simple riff. The model could maybe give you back a
-          whole melody. Press "play" to hear the generated melody. Press "edit"
-          to change the riff.
+          whole melody. Press <span>play</span> to hear the generated melody.
+          Listen to some melodies other user generated in the
+          <span>history</span>. Press <span>edit</span> to create a new riff.
+          About <span id="total-number">73</span> melodies are generated using
+          this project.
         </p>
       </header>
       <div id="control-container">
@@ -178,6 +188,16 @@
 
       <div id="canvas-wrapper">
         <div id="canvas-container">
+          <div id="panel-container">
+            <div>
+              <button id="play-again-btn">
+                play again
+              </button>
+              <button id="play-next-btn">
+                play next →
+              </button>
+            </div>
+          </div>
           <p id="canvas-text">🤖 generated</p>
           <p id="canvas-text-left">🎹 riff</p>
           <canvas id="play-canvas"></canvas>

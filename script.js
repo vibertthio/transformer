@@ -17,6 +17,7 @@ const SERVER_URL = " https://musicai.citi.sinica.edu.tw/remi_piano/api/";
 const POST_MIDI_URL = SERVER_URL + "getPianoMidi";
 const GET_SERVER_STATE_URL = SERVER_URL + "getJobQueueSize";
 const GET_MIDI_BY_ID = SERVER_URL + "getGeneratedMidi";
+const GET_RANDOM_MIDI = SERVER_URL + "getRandomMidi";
 
 const controlPlayButton = document.getElementById("play-btn");
 const playButtonTip = document.getElementById("play-btn-tip");
@@ -80,6 +81,27 @@ document.getElementById("play-btn").addEventListener("click", () => {
     startMainSequencer();
   }
 });
+document.getElementById("play-again-btn").addEventListener("click", e => {
+  if (audioContext.state == "suspended") {
+    console.log("audioContext.resume");
+    audioContext.resume();
+  }
+  startMainSequencer();
+  e.stopPropagation();
+});
+document.getElementById("play-next-btn").addEventListener("click", e => {
+  if (audioContext.state == "suspended") {
+    console.log("audioContext.resume");
+    audioContext.resume();
+  }
+  if (historyCurrentIndex < history.length - 1) {
+    traverseHistory(historyCurrentIndex + 1);
+  }
+
+  startMainSequencer();
+  e.stopPropagation();
+});
+
 // !isMobile &&
 //   document.getElementById("play-btn").addEventListener("mouseenter", () => {
 //     // console.log("in");
@@ -154,6 +176,7 @@ document.getElementById("next-btn").addEventListener("click", () => {
   }
 });
 document.getElementById("canvas-wrapper").addEventListener("click", () => {
+  console.log("click canvas");
   if (sequencer.state === "started") {
     stopMainSequencer();
   } else {
@@ -382,7 +405,9 @@ async function postData(url = "", data = {}) {
     method: "POST",
     // mode: "no-cors",
     headers: {
-      "Content-Type": "application/json"
+      Origin: "https://vibertthio.com/transformer",
+      "Content-Type": "application/json",
+      key: "e4a3a249dfb28ea83cd9ec22bc6c47ea964916061aa24c0ae4b6a502eccdc06e"
     },
     body: JSON.stringify(data)
   });
@@ -404,6 +429,12 @@ async function getGeneratedMidiById(
   console.log("response", d);
   return d;
   // return data[1].output;
+}
+async function getRandomMidis(url = GET_RANDOM_MIDI, n = 5) {
+  const response = await fetch(`${url}?num_sample=${n}`);
+  const d = await response.json();
+  console.log("response", d);
+  return d;
 }
 function closeEditSplash() {
   const splash = document.getElementById("edit-splash");
@@ -538,7 +569,7 @@ function drawEditingPianoroll(ctx, events, matrix) {
   if (editSequencer.state === "started") {
     ctx.fillStyle = "rgb(0, 200, 0)";
     // ctx.fillRect(width * editSequencer.progress, 0, wUnit * 0.3, height);
-    ctx.fillRect(beat * wUnit, 0, wUnit * 0.2, height);
+    ctx.fillRect(beat * wUnit, 0, wUnit * 0.5, height);
   }
 
   if (!mouseEditing) {
@@ -635,15 +666,19 @@ function stopMainSequencer(cancelEnvelopes = true) {
   } else {
     // piano.volume.rampTo(-100, 5);
   }
+
+  document.getElementById("panel-container").style.display = "flex";
 }
 function startMainSequencer() {
   console.log("start time", audioContext.now());
-  piano.releaseAll(audioContext.now());
-  // piano.releaseAll();
+  // piano.releaseAll(audioContext.now());
+  piano.releaseAll("+0.05");
   controlPlayButton.textContent = "stop";
   piano.volume.rampTo(0, 0);
-  sequencer.start(audioContext.now());
-  // sequencer.start();
+  // sequencer.start(audioContext.now());
+  sequencer.start("+0.1");
+
+  document.getElementById("panel-container").style.display = "none";
 }
 function stopEditSequencer(cancelEnvelopes = true) {
   controlEditPlayButton.textContent = "► play";
@@ -658,10 +693,12 @@ function stopEditSequencer(cancelEnvelopes = true) {
   }
 }
 function startEditSequencer() {
-  piano.releaseAll(audioContext.now());
+  // piano.releaseAll(audioContext.now());
+  piano.releaseAll("+0.05");
   controlEditPlayButton.textContent = "stop";
   piano.volume.rampTo(0, 0);
-  editSequencer.start(audioContext.now());
+  // editSequencer.start(audioContext.now());
+  editSequencer.start("+0.1");
 }
 function pushHistory() {
   history.push({
@@ -679,6 +716,26 @@ function pushHistory() {
   historyCurrentIndexElement.textContent = `${historyCurrentIndex + 1}`;
   historyLenghtElement.textContent = `${history.length}`;
 
+  traverseHistory(historyCurrentIndex);
+}
+function pushNewDataToHistory(d) {
+  const p = d.output.data.pianoroll;
+  const es = getEventsTimelineFromMatrix(p);
+  const ip = d.input.pianoroll;
+  const ies = getEventsTimelineFromMatrix(ip);
+  history.push({
+    input: {
+      pianoroll: ip,
+      events: ies
+    },
+    output: {
+      id: currentUrlId,
+      pianoroll: p,
+      events: es
+    }
+  });
+  historyCurrentIndexElement.textContent = `${historyCurrentIndex + 1}`;
+  historyLenghtElement.textContent = `${history.length}`;
   traverseHistory(historyCurrentIndex);
 }
 function traverseHistory(index) {
@@ -855,6 +912,23 @@ document
       }
     }
     pushHistory();
+
+    const response = await getRandomMidis();
+    if (response.state !== "success") {
+      for (let i = 1; i < 4; i++) {
+        pushNewDataToHistory(data[i]);
+      }
+    } else {
+      response.data.pianoroll.forEach(p => {
+        const d = {
+          input: p.slice(0, NUMBER_OF_INPUT_BARS * NOTES_PER_BAR),
+          output: p
+        };
+        pushNewDataToHistory(data[i]);
+      });
+      document.getElementById("total-number").textContent =
+        response.data.num_current_sample;
+    }
 
     document.getElementById("wrapper").style.visibility = "visible";
     const splash = document.getElementById("splash");
